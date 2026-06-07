@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "rust-lang.rust-analyzer",
+    "tamasfe.even-better-toml",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "tauri-apps.tauri-vscode",
+    "ms-playwright.playwright",
+    "EditorConfig.EditorConfig",
+    "usernamehw.errorlens"
+  ]
+}

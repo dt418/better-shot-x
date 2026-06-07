@@ -16,11 +16,14 @@ build/
 /apps/desktop/src-tauri/gen
 
 # Editor
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
+# Track shared IDE config, ignore user-specific
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # OS
 .DS_Store
