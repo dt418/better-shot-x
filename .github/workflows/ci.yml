@@ -11,9 +11,40 @@ env:
   RUSTFLAGS: '-D warnings'
 
 jobs:
+  frontend-dist:
+    name: Build frontend dist
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        # pnpm version is pinned via `packageManager` in package.json —
+        # do not also pass `version:` here or the action refuses to run.
+        with:
+          dest: ~/setup-pnpm
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm --filter @better-shot/desktop build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: apps/desktop/dist
+          retention-days: 1
+
   rust:
     name: Rust (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    needs: frontend-dist
     strategy:
       fail-fast: false
       matrix:
@@ -40,6 +71,12 @@ jobs:
         with:
           workspaces: 'target -> .git/ci-target-cache'
 
+      - name: Download frontend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: apps/desktop/dist
+
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
@@ -60,7 +97,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          dest: ~/setup-pnpm
 
       - uses: actions/setup-node@v4
         with:
@@ -81,6 +118,3 @@ jobs:
 
       - name: Test
         run: pnpm --filter @better-shot/desktop test
-
-      - name: Build
-        run: pnpm --filter @better-shot/desktop build
