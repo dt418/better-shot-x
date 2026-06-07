@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Better Shot",
+    "tagline": "Linux 上最好的开源截图应用",
+    "bridge": "后端",
+    "connecting": "连接中…",
+    "placeholder": "捕获窗口、选区或全屏。使用全局快捷键或托盘菜单。此窗口为占位符 — Milestone 1 功能将在此处呈现。"
+  },
+  "tray": {
+    "captureRegion": "捕获选区",
+    "captureFullscreen": "捕获全屏",
+    "captureWindow": "捕获窗口",
+    "openHistory": "打开历史",
+    "openSettings": "设置",
+    "quit": "退出"
+  },
+  "settings": {
+    "title": "设置",
+    "capture": "截图",
+    "shortcuts": "快捷键",
+    "editor": "编辑器",
+    "ocr": "文字识别",
+    "recording": "录屏",
+    "uploads": "上传",
+    "privacy": "隐私",
+    "advanced": "高级"
+  }
+}

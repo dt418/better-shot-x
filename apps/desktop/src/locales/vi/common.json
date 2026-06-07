@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Better Shot",
+    "tagline": "Phần mềm chụp ảnh màn hình mã nguồn mở tốt nhất cho Linux",
+    "bridge": "Backend",
+    "connecting": "Đang kết nối…",
+    "placeholder": "Chụp cửa sổ, vùng chọn hoặc toàn màn hình. Nhấn phím tắt toàn cục hoặc dùng menu khay hệ thống. Đây là màn hình tạm — các tính năng Milestone 1 sẽ xuất hiện tại đây."
+  },
+  "tray": {
+    "captureRegion": "Chụp vùng chọn",
+    "captureFullscreen": "Chụp toàn màn hình",
+    "captureWindow": "Chụp cửa sổ",
+    "openHistory": "Mở lịch sử",
+    "openSettings": "Cài đặt",
+    "quit": "Thoát"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "capture": "Chụp ảnh",
+    "shortcuts": "Phím tắt",
+    "editor": "Trình chỉnh sửa",
+    "ocr": "Nhận dạng văn bản",
+    "recording": "Quay màn hình",
+    "uploads": "Tải lên",
+    "privacy": "Quyền riêng tư",
+    "advanced": "Nâng cao"
+  }
+}

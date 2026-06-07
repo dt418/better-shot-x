@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Better Shot",
+    "tagline": "The best open-source screenshot app for Linux",
+    "bridge": "Backend",
+    "connecting": "Connecting…",
+    "placeholder": "Capture window, region, or full screen. Press the global shortcut or use the tray menu. This window is a placeholder — Milestone 1 features will appear here."
+  },
+  "tray": {
+    "captureRegion": "Capture Region",
+    "captureFullscreen": "Capture Fullscreen",
+    "captureWindow": "Capture Window",
+    "openHistory": "Open History",
+    "openSettings": "Settings",
+    "quit": "Quit"
+  },
+  "settings": {
+    "title": "Settings",
+    "capture": "Capture",
+    "shortcuts": "Shortcuts",
+    "editor": "Editor",
+    "ocr": "OCR",
+    "recording": "Recording",
+    "uploads": "Uploads",
+    "privacy": "Privacy",
+    "advanced": "Advanced"
+  }
+}
