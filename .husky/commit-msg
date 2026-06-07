@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# Commit-msg hook: enforce Conventional Commits via commitlint.
+#
+# Skipped during rebase/merge (no message in the staged form) so that history
+# rewrites don't fail the hook. Use `git commit --no-verify` only when needed.
+
+if [ -z "$(git log -1 --format=%B HEAD~1 2>/dev/null)" ] && git rev-parse --verify HEAD >/dev/null 2>&1; then
+  : # HEAD has no parent, skip
+elif [ -f .git/MERGE_HEAD ] || [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; then
+  exit 0
+fi
+
+npx --no-install commitlint --edit "$1"

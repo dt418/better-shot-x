@@ -1,0 +1,46 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "help": "https://www.conventionalcommits.org/en/v1.0.0/",
+  "rules": {
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "build",
+        "ci",
+        "chore",
+        "revert"
+      ]
+    ],
+    "type-case": [2, "always", "lower-case"],
+    "type-empty": [2, "never"],
+    "subject-case": [2, "always", "lower-case"],
+    "subject-empty": [2, "never"],
+    "subject-full-stop": [2, "never", "."],
+    "subject-max-length": [2, "always", 72],
+    "header-max-length": [2, "always", 100],
+    "body-leading-blank": [2, "always"],
+    "body-max-line-length": [1, "always", 100],
+    "footer-leading-blank": [2, "always"],
+    "footer-max-line-length": [2, "always", 100],
+    "references-empty": [2, "never"],
+    "signed-off-by": [0, "never"],
+    "trailer-exists": [0, "never"]
+  },
+  "prompt": {
+    "questions": [
+      "type (feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)",
+      "scope (e.g. editor, capture, ui, ci, commitlint)",
+      "subject (lower-case, no trailing period, ≤72 chars)",
+      "body (wrap at 100 chars, explain what and why)",
+      "footer (BREAKING CHANGE: ... or issue refs)"
+    ]
+  }
+}

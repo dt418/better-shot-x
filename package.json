@@ -1,0 +1,55 @@
+{
+  "name": "better-shot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Best open-source screenshot and screen recording application for Linux",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "dev": "pnpm --filter @better-shot/desktop dev",
+    "build": "pnpm --filter @better-shot/desktop build",
+    "preview": "pnpm --filter @better-shot/desktop preview",
+    "tauri": "pnpm --filter @better-shot/desktop tauri",
+    "tauri:dev": "pnpm --filter @better-shot/desktop tauri:dev",
+    "tauri:build": "pnpm --filter @better-shot/desktop tauri:build",
+    "lint": "pnpm -r --parallel lint",
+    "lint:fix": "pnpm -r --parallel lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,toml,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,toml,css}\"",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "pnpm -r --parallel test",
+    "test:coverage": "pnpm -r --parallel test:coverage",
+    "test:e2e": "pnpm --filter @better-shot/desktop test:e2e",
+    "commitlint:check": "commitlint --from=HEAD~1 --to=HEAD",
+    "commitlint:check:all": "commitlint --from=HEAD~10 --to=HEAD",
+    "commit": "commit",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@types/node": "^22.10.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix"
+    ],
+    "*.{ts,tsx,js,jsx,json,md,yml,yaml,toml,css}": [
+      "prettier --write"
+    ],
+    "*.rs": [
+      "cargo fmt --"
+    ]
+  }
+}
