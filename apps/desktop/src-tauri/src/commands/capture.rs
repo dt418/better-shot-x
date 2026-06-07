@@ -3,7 +3,7 @@
 
 use std::path::PathBuf;
 
-use better_shot_capture::window::WindowInfo;
+use better_shot_capture::window::{WindowId, WindowInfo};
 use better_shot_capture::{select_backend, window as window_engine, CaptureRequest};
 use better_shot_core::prelude::{AppPaths, ImageFormat};
 use tauri::State;
@@ -38,6 +38,34 @@ pub async fn capture_save(
 #[specta::specta]
 pub async fn list_windows() -> CmdResult<Vec<WindowInfo>> {
     window_engine::list_windows().map_err(|e| e.to_string())
+}
+
+/// Capture a specific window by id and save it to the configured
+/// screenshots directory. Returns the absolute path of the saved file.
+#[tauri::command]
+#[specta::specta]
+pub async fn capture_window(
+    state: State<'_, AppState>,
+    id: WindowId,
+    format: ImageFormat,
+) -> CmdResult<String> {
+    tracing::info!(?id, "capture_window invoked");
+    let capture = window_engine::capture_window(&id)
+        .await
+        .map_err(|e| e.to_string())?;
+    let path = build_output_path(&state.paths, &format);
+    capture.save_to(&path, format).map_err(|e| e.to_string())?;
+    let byte_size = std::fs::metadata(&path)
+        .map(|m| m.len() as u32)
+        .unwrap_or(0);
+    let _ = better_shot_storage::add_screenshot(
+        &state.storage,
+        path.to_str().unwrap_or_default(),
+        capture.width,
+        capture.height,
+        byte_size,
+    );
+    Ok(path.to_string_lossy().into_owned())
 }
 
 fn build_output_path(paths: &AppPaths, format: &ImageFormat) -> PathBuf {

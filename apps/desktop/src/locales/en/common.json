@@ -24,5 +24,21 @@
     "uploads": "Uploads",
     "privacy": "Privacy",
     "advanced": "Advanced"
+  },
+  "capture": {
+    "title": "Window Capture",
+    "listWindows": "Listed {count} windows",
+    "noWindows": "No windows found",
+    "capturing": "Capturing…",
+    "success": "Screenshot saved",
+    "error": "Capture failed",
+    "app": "App"
+  },
+  "history": {
+    "title": "History",
+    "searchPlaceholder": "Search OCR text…",
+    "search": "Search",
+    "empty": "No screenshots yet",
+    "delete": "Delete"
   }
 }

@@ -24,5 +24,21 @@
     "uploads": "Tải lên",
     "privacy": "Quyền riêng tư",
     "advanced": "Nâng cao"
+  },
+  "capture": {
+    "title": "Chụp cửa sổ",
+    "listWindows": "Đã tìm {count} cửa sổ",
+    "noWindows": "Không tìm thấy cửa sổ nào",
+    "capturing": "Đang chụp…",
+    "success": "Đã lưu ảnh chụp",
+    "error": "Chụp thất bại",
+    "app": "Ứng dụng"
+  },
+  "history": {
+    "title": "Lịch sử",
+    "searchPlaceholder": "Tìm kiếm văn bản OCR…",
+    "search": "Tìm",
+    "empty": "Chưa có ảnh chụp nào",
+    "delete": "Xóa"
   }
 }

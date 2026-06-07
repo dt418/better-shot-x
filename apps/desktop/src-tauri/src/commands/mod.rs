@@ -6,5 +6,6 @@
 pub mod capture;
 pub mod clipboard;
 pub mod health;
+pub mod history;
 pub mod settings;
 pub mod shortcuts;

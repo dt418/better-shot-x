@@ -7,6 +7,8 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 import { SettingsPage } from '@/routes/settings';
+import { CapturePage } from '@/routes/capture';
+import { HistoryPage } from '@/routes/history';
 
 type Health = { status: 'ok' | 'error'; message: string };
 
@@ -79,6 +81,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/capture" element={<CapturePage />} />
+        <Route path="/history" element={<HistoryPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
       <Toaster />

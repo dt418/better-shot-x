@@ -24,5 +24,21 @@
     "uploads": "上传",
     "privacy": "隐私",
     "advanced": "高级"
+  },
+  "capture": {
+    "title": "窗口截图",
+    "listWindows": "已列出 {count} 个窗口",
+    "noWindows": "未找到窗口",
+    "capturing": "截图进行中…",
+    "success": "截图已保存",
+    "error": "截图失败",
+    "app": "应用"
+  },
+  "history": {
+    "title": "历史",
+    "searchPlaceholder": "搜索 OCR 文本…",
+    "search": "搜索",
+    "empty": "暂无截图",
+    "delete": "删除"
   }
 }

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **M2 Window Capture**: window enumeration via `grim` (Wayland) and `xdotool` (X11), per-window capture with automatic save to screenshots directory, window picker UI at `/capture`
+- **M3 History**: SQLite storage with FTS5 OCR search, history commands (list/search/delete/favorite/tag), history grid UI at `/history`
 - Workspace scaffold: 13 Rust crates + Tauri 2 desktop app
 - React + Vite + TypeScript strict frontend
 - shadcn/ui + Radix UI primitives

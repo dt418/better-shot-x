@@ -25,14 +25,17 @@ pub use error::CmdResult;
 pub struct AppState {
     pub paths: AppPaths,
     pub settings: Arc<Mutex<AppConfig>>,
+    pub storage: better_shot_storage::Storage,
 }
 
 impl AppState {
     pub fn new(paths: AppPaths) -> Result<Self> {
         let settings = better_shot_settings::load(&paths.config_file())?;
+        let storage = better_shot_storage::Storage::open(&paths.database_file())?;
         Ok(Self {
             paths,
             settings: Arc::new(Mutex::new(settings)),
+            storage,
         })
     }
 }
@@ -47,8 +50,15 @@ pub fn build_specta<R: Runtime>() -> SpectaBuilder<R> {
         commands::settings::get_settings,
         commands::settings::update_settings,
         commands::capture::capture_save,
+        commands::capture::list_windows,
+        commands::capture::capture_window,
         commands::clipboard::clipboard_copy_image,
         commands::clipboard::clipboard_copy_text,
+        commands::history::list_history,
+        commands::history::search_history,
+        commands::history::delete_history,
+        commands::history::favorite_history,
+        commands::history::tag_history,
     ])
 }
 
@@ -213,6 +223,14 @@ mod tests {
         assert!(
             body.contains("captureSave"),
             "captureSave missing from bindings"
+        );
+        assert!(
+            body.contains("listWindows"),
+            "listWindows missing from bindings"
+        );
+        assert!(
+            body.contains("captureWindow"),
+            "captureWindow missing from bindings"
         );
         assert!(
             body.contains("clipboardCopyImage"),

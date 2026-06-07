@@ -120,6 +120,19 @@ impl Default for Id {
     }
 }
 
+/// A saved screenshot entry.
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
+pub struct Screenshot {
+    pub id: Id,
+    pub path: String,
+    pub width: u32,
+    pub height: u32,
+    pub byte_size: u32,
+    pub created_at: String,
+    pub favorited: bool,
+    pub tags: Vec<String>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
