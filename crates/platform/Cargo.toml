@@ -17,7 +17,9 @@ tracing = { workspace = true }
 parking_lot = { workspace = true }
 async-trait = { workspace = true }
 which = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 zbus = { version = "4", default-features = false, features = ["tokio"] }
-ashpd = { version = "0.11", default-features = false, features = ["async-std"] }
+ashpd = { version = "0.11", default-features = false, features = ["tokio"] }

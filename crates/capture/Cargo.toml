@@ -9,13 +9,16 @@ description = "Screenshot capture engine (region, fullscreen, window)"
 [dependencies]
 better-shot-core = { path = "../core" }
 better-shot-platform = { path = "../platform" }
-
 serde = { workspace = true }
+specta = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 image = { workspace = true }
 tokio = { workspace = true }
 async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt", "time"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 screenshots = "0.8"

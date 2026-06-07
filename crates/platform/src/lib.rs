@@ -37,6 +37,87 @@ pub fn which(tool: &str) -> Result<std::path::PathBuf> {
     which::which(tool).map_err(|e| AppError::MissingDependency(format!("{tool}: {e}")))
 }
 
+/// Output of an XDG Desktop Portal screenshot request.
+///
+/// The portal hands back a `file://` URI (for newer compositors) or
+/// a `fd://` URI (older). Callers should treat it as opaque bytes —
+/// decoding into a bitmap belongs to the capture crate.
+#[cfg(target_os = "linux")]
+#[derive(Debug, Clone)]
+pub struct PortalScreenshot {
+    /// Raw bytes (PNG) of the screenshot.
+    pub bytes: Vec<u8>,
+}
+
+/// Request an interactive screenshot via the XDG Desktop Portal.
+///
+/// `interactive=true` lets the user pick a region / window in the
+/// portal UI. `modal=true` blocks the application window until the
+/// user makes a choice. Returns `Err(AppError::Cancelled)` if the
+/// user dismisses the portal.
+#[cfg(target_os = "linux")]
+pub async fn portal_take_screenshot() -> Result<PortalScreenshot> {
+    use ashpd::desktop::screenshot::Screenshot;
+
+    let request = Screenshot::request()
+        .interactive(true)
+        .modal(true)
+        .send()
+        .await
+        .map_err(|e| AppError::backend(format!("portal: send: {e}")))?;
+
+    let response = request.response().map_err(|e| {
+        if is_user_cancelled(&e) {
+            AppError::Cancelled
+        } else {
+            AppError::backend(format!("portal: response: {e}"))
+        }
+    })?;
+
+    let uri = response.uri();
+    let bytes = read_uri(uri).await?;
+    Ok(PortalScreenshot { bytes })
+}
+
+#[cfg(target_os = "linux")]
+fn is_user_cancelled(err: &ashpd::Error) -> bool {
+    matches!(err, ashpd::Error::Response(_)) && err.to_string().to_lowercase().contains("cancel")
+}
+
+#[cfg(target_os = "linux")]
+async fn read_uri(uri: &url::Url) -> Result<Vec<u8>> {
+    use tokio::io::AsyncReadExt;
+
+    match uri.scheme() {
+        "file" => {
+            let path = uri
+                .to_file_path()
+                .map_err(|_| AppError::backend(format!("portal: invalid file URI: {uri}")))?;
+            tokio::fs::read(&path).await.map_err(AppError::from)
+        }
+        "fd" => {
+            // `fd://N` — the portal hands us a file descriptor
+            // number. We read it through `/proc/self/fd/N` so the
+            // kernel does the actual file I/O and the fd is closed
+            // when the procfs handle is dropped. Avoids `unsafe`.
+            let fd: i32 = uri
+                .host_str()
+                .and_then(|s| s.parse().ok())
+                .ok_or_else(|| AppError::backend(format!("portal: invalid fd URI: {uri}")))?;
+            let proc_path = format!("/proc/self/fd/{fd}");
+            let mut file = tokio::fs::File::open(&proc_path)
+                .await
+                .map_err(|e| AppError::backend(format!("portal: open {proc_path}: {e}")))?;
+            let mut buf = Vec::new();
+            file.read_to_end(&mut buf).await.map_err(AppError::from)?;
+            Ok(buf)
+        }
+        other => Err(AppError::backend(format!(
+            "portal: unsupported URI scheme: {other}"
+        ))),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

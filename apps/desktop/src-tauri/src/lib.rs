@@ -46,6 +46,7 @@ pub fn build_specta<R: Runtime>() -> SpectaBuilder<R> {
         commands::health::ping,
         commands::settings::get_settings,
         commands::settings::update_settings,
+        commands::capture::capture_save,
     ])
 }
 
@@ -183,5 +184,24 @@ mod tests {
         let snapshot = state.settings.lock().clone();
         assert_eq!(snapshot.locale, "vi");
         assert_eq!(snapshot.theme, Theme::Dark);
+    }
+
+    /// `build_specta` must produce a valid TypeScript export with
+    /// every registered command (including the capture command).
+    /// Regression: M1.0 wired 3 commands; M1.1 added `capture_save`.
+    #[test]
+    fn specta_export_includes_all_commands() {
+        let tmp = tempfile::tempdir().unwrap();
+        let out = tmp.path().join("bindings.ts");
+        let result = build_specta::<tauri::Wry>().export(
+            specta_typescript::Typescript::default(),
+            out.to_str().unwrap(),
+        );
+        assert!(result.is_ok(), "specta export failed: {result:?}");
+        let body = std::fs::read_to_string(&out).expect("bindings.ts missing");
+        assert!(body.contains("ping"), "ping missing from bindings");
+        assert!(body.contains("getSettings"), "getSettings missing from bindings");
+        assert!(body.contains("updateSettings"), "updateSettings missing from bindings");
+        assert!(body.contains("captureSave"), "captureSave missing from bindings");
     }
 }
