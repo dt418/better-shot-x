@@ -1,0 +1,19 @@
+[package]
+name = "better-shot-editor"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Image editor engine — full Snagit-tier feature set"
+
+[dependencies]
+better-shot-core = { path = "../core" }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+image = { workspace = true }
+tiny-skia = { workspace = true }
+resvg = { workspace = true }
+parking_lot = { workspace = true }
+uuid = { workspace = true }

@@ -1,0 +1,22 @@
+[package]
+name = "better-shot-recording"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Screen recording engine — wf-recorder / ffmpeg backends"
+
+[dependencies]
+better-shot-core = { path = "../core" }
+better-shot-platform = { path = "../platform" }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+ffmpeg-next = { workspace = true }

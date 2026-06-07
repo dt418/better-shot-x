@@ -1,0 +1,16 @@
+[package]
+name = "better-shot-tray"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "System tray integration for Better Shot"
+
+[dependencies]
+better-shot-core = { path = "../core" }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+parking_lot = { workspace = true }
+tauri = { workspace = true }

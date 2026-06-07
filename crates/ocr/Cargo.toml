@@ -1,0 +1,19 @@
+[package]
+name = "better-shot-ocr"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "OCR engine — Tesseract (Phase 1), local AI (Phase 2)"
+
+[dependencies]
+better-shot-core = { path = "../core" }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+parking_lot = { workspace = true }
+image = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+leptess = { workspace = true }

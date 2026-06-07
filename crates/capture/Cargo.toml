@@ -1,0 +1,21 @@
+[package]
+name = "better-shot-capture"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Screenshot capture engine (region, fullscreen, window)"
+
+[dependencies]
+better-shot-core = { path = "../core" }
+better-shot-platform = { path = "../platform" }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+image = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+screenshots = "0.8"

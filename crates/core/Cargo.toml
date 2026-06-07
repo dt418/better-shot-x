@@ -1,0 +1,27 @@
+[package]
+name = "better-shot-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Shared types, errors, paths, and config primitives for Better Shot"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+directories = { workspace = true }
+dirs = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+url = { workspace = true }
+parking_lot = { workspace = true }
+anyhow = { workspace = true }
+rusqlite = { workspace = true }
+sqlx = { workspace = true }
+image = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

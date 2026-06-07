@@ -1,0 +1,23 @@
+[package]
+name = "better-shot-platform"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Linux platform layer: Wayland/X11, dialogs, notifications, shortcuts, tray"
+
+[dependencies]
+better-shot-core = { path = "../core" }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+parking_lot = { workspace = true }
+async-trait = { workspace = true }
+which = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+zbus = { version = "4", default-features = false, features = ["tokio"] }
+ashpd = { version = "0.11", default-features = false, features = ["async-std"] }
