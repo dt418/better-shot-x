@@ -47,6 +47,8 @@ pub fn build_specta<R: Runtime>() -> SpectaBuilder<R> {
         commands::settings::get_settings,
         commands::settings::update_settings,
         commands::capture::capture_save,
+        commands::clipboard::clipboard_copy_image,
+        commands::clipboard::clipboard_copy_text,
     ])
 }
 
@@ -200,8 +202,25 @@ mod tests {
         assert!(result.is_ok(), "specta export failed: {result:?}");
         let body = std::fs::read_to_string(&out).expect("bindings.ts missing");
         assert!(body.contains("ping"), "ping missing from bindings");
-        assert!(body.contains("getSettings"), "getSettings missing from bindings");
-        assert!(body.contains("updateSettings"), "updateSettings missing from bindings");
-        assert!(body.contains("captureSave"), "captureSave missing from bindings");
+        assert!(
+            body.contains("getSettings"),
+            "getSettings missing from bindings"
+        );
+        assert!(
+            body.contains("updateSettings"),
+            "updateSettings missing from bindings"
+        );
+        assert!(
+            body.contains("captureSave"),
+            "captureSave missing from bindings"
+        );
+        assert!(
+            body.contains("clipboardCopyImage"),
+            "clipboardCopyImage missing from bindings"
+        );
+        assert!(
+            body.contains("clipboardCopyText"),
+            "clipboardCopyText missing from bindings"
+        );
     }
 }

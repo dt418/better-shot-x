@@ -4,6 +4,7 @@
 //! `Result<T, AppError>` and use the shared [`AppState`].
 
 pub mod capture;
+pub mod clipboard;
 pub mod health;
 pub mod settings;
 pub mod shortcuts;
