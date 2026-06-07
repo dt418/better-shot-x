@@ -1,0 +1,151 @@
+[workspace]
+resolver = "2"
+members = [
+    "apps/desktop/src-tauri",
+    "crates/core",
+    "crates/platform",
+    "crates/capture",
+    "crates/editor",
+    "crates/ocr",
+    "crates/recording",
+    "crates/clipboard",
+    "crates/storage",
+    "crates/uploads",
+    "crates/sync",
+    "crates/plugins",
+    "crates/settings",
+    "crates/tray",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+authors = ["Better Shot Contributors"]
+repository = "https://github.com/better-shot/better-shot"
+homepage = "https://better-shot.app"
+
+[workspace.dependencies]
+# Tauri
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-shell = "2"
+tauri-plugin-os = "2"
+tauri-plugin-process = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-log = "2"
+tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
+specta = "=2.0.0-rc.25"
+specta-typescript = "0.0"
+
+# Async
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+
+# Database
+rusqlite = { version = "0.32", features = ["bundled"] }
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite"] }
+
+# Utilities
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+directories = "5"
+dirs = "5"
+keyring = "3"
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.22"
+url = "2"
+once_cell = "1"
+parking_lot = "0.12"
+arc-swap = "1"
+walkdir = "2"
+notify = "6"
+tempfile = "3"
+
+# Image
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "bmp", "tiff"] }
+png = "0.17"
+
+# Image processing (for editor)
+resvg = "0.45"
+tiny-skia = "0.11"
+
+# Clipboard
+arboard = "3"
+
+# OCR
+leptess = "0.14"
+
+# Recording
+ffmpeg-next = "7"
+
+# Utility
+which = "7"
+
+# Crypto / encryption (for sync E2E)
+age = "0.11"
+
+# Config
+config = "0.14"
+
+# HTTP
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "multipart"] }
+
+# YAML (for GitHub Actions validation in some tooling)
+serde_yaml = "0.9"
+
+# Plugin SDK
+wasmtime = "24"
+wasi = "0.14"
+
+# Lints
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+unused_must_use = "deny"
+missing_docs = "warn"
+dead_code = "warn"
+
+[profile.dev]
+opt-level = 0
+debug = 1
+incremental = true
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+
+[profile.release-with-debug]
+inherits = "release"
+debug = 1
+strip = "none"

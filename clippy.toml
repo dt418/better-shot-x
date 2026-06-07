@@ -1,0 +1,13 @@
+avoid-breaking-exported-api = false
+disallowed-methods = [
+    { path = "std::env::var", reason = "Use crate::config to access env vars explicitly" },
+    { path = "std::process::Command::new", reason = "Use Platform Layer to spawn processes" },
+]
+disallowed-types = [
+    { path = "std::sync::Mutex", reason = "Use parking_lot::Mutex" },
+    { path = "std::sync::RwLock", reason = "Use parking_lot::RwLock" },
+]
+cognitive-complexity-threshold = 25
+too-many-arguments-threshold = 8
+type-complexity-threshold = 250
+trivial-copy-size-limit = 64

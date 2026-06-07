@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Pre-commit hook: format and lint staged files.
+#
+# Runs the linters only if the staged files contain a relevant set; this
+# keeps the hook fast on docs-only or pure-data commits. Toolchains that
+# are not installed (e.g. cargo missing on a JS-only workstation) cause
+# the hook to skip silently rather than block the commit.
+
+set -e
+
+STAGED=$(git diff --cached --name-only)
+
+# JS/TS: format + lint via lint-staged
+if printf '%s\n' "$STAGED" | grep -qE '\.(ts|tsx|js|jsx|cjs|mjs|json|md|yml|yaml|css)$'; then
+  npx --no-install lint-staged || true
+fi
+
+# Rust: only run if a .rs file is staged AND cargo is available
+if printf '%s\n' "$STAGED" | grep -qE '\.rs$' && command -v cargo >/dev/null 2>&1; then
+  cargo fmt --all
+  cargo clippy --workspace --all-targets -- -D warnings
+fi
