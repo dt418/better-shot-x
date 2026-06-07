@@ -1,6 +1,6 @@
 packages:
-  - "apps/*"
-  - "crates/*/web"
-  - "plugins/*"
+  - 'apps/*'
+  - 'crates/*/web'
+  - 'plugins/*'
 allowBuilds:
   esbuild: true

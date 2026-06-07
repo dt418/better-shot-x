@@ -7,3 +7,15 @@ coverage
 *.lock
 package-lock.json
 pnpm-lock.yaml
+
+# Stray tsc -b build artifacts
+**/vite.config.d.ts
+**/vite.config.js
+**/vitest.config.d.ts
+**/vitest.config.js
+**/*.tsbuildinfo
+
+# Rust files are formatted by cargo fmt, not prettier
+**/Cargo.toml
+**/rustfmt.toml
+**/clippy.toml

@@ -54,7 +54,7 @@ function HomePage() {
           </Button>
         </div>
       </header>
-      <main className="flex flex-1 items-center justify-center px-6 text-center text-muted-foreground">
+      <main className="text-muted-foreground flex flex-1 items-center justify-center px-6 text-center">
         {t('app.placeholder')}
       </main>
     </div>

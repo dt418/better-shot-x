@@ -19,6 +19,17 @@ pub enum DisplayBackend {
     Unknown,
 }
 
+impl std::fmt::Display for DisplayBackend {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Self::Wayland => "wayland",
+            Self::X11 => "x11",
+            Self::Unknown => "unknown",
+        };
+        f.write_str(s)
+    }
+}
+
 impl DisplayBackend {
     /// Detect the active backend at runtime.
     pub fn detect() -> Self {
@@ -35,6 +46,47 @@ impl DisplayBackend {
 /// Probe whether a CLI tool is available on `$PATH`.
 pub fn which(tool: &str) -> Result<std::path::PathBuf> {
     which::which(tool).map_err(|e| AppError::MissingDependency(format!("{tool}: {e}")))
+}
+
+/// Captured output of a child process, mirroring `std::process::Output`.
+#[derive(Debug)]
+pub struct CommandOutput {
+    pub status: std::process::ExitStatus,
+    pub stdout: Vec<u8>,
+    pub stderr: Vec<u8>,
+}
+
+/// Run a child process synchronously and return its captured output.
+///
+/// Thin wrapper around `std::process::Command` so callers don't have to
+/// reach into `std::process` directly (see `clippy.toml`'s disallowed list).
+#[allow(clippy::disallowed_methods)]
+pub fn command_output_sync(cmd: &str, args: &[&str]) -> Result<CommandOutput> {
+    let output = std::process::Command::new(cmd)
+        .args(args)
+        .output()
+        .map_err(|e| AppError::backend(format!("{cmd} spawn: {e}")))?;
+    Ok(CommandOutput {
+        status: output.status,
+        stdout: output.stdout,
+        stderr: output.stderr,
+    })
+}
+
+/// Run a child process asynchronously and return its captured output.
+///
+/// Async equivalent of [`command_output_sync`].
+pub async fn command_output_async(cmd: &str, args: &[&str]) -> Result<CommandOutput> {
+    let output = tokio::process::Command::new(cmd)
+        .args(args)
+        .output()
+        .await
+        .map_err(|e| AppError::backend(format!("{cmd} spawn: {e}")))?;
+    Ok(CommandOutput {
+        status: output.status,
+        stdout: output.stdout,
+        stderr: output.stderr,
+    })
 }
 
 /// Output of an XDG Desktop Portal screenshot request.
@@ -125,5 +177,18 @@ mod tests {
     #[test]
     fn detect_does_not_panic() {
         let _ = DisplayBackend::detect();
+    }
+
+    #[test]
+    fn command_output_sync_captures_stdout() {
+        let out = command_output_sync("true", &[]).expect("true should run");
+        assert!(out.status.success());
+        assert!(out.stdout.is_empty());
+    }
+
+    #[test]
+    fn command_output_sync_reports_failure() {
+        let out = command_output_sync("false", &[]).expect("false should run");
+        assert!(!out.status.success());
     }
 }

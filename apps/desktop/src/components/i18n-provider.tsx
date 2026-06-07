@@ -54,9 +54,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       <div
         role="status"
         aria-live="polite"
-        className="grid min-h-screen place-items-center bg-background text-foreground"
+        className="bg-background text-foreground grid min-h-screen place-items-center"
       >
-        <span className="animate-pulse text-sm text-muted-foreground">Loading…</span>
+        <span className="text-muted-foreground animate-pulse text-sm">Loading…</span>
       </div>
     );
   }

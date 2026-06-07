@@ -10,6 +10,7 @@
 
 mod backends;
 mod decode;
+pub mod window;
 
 use std::path::PathBuf;
 
@@ -65,6 +66,8 @@ pub struct CaptureRequest {
     pub mode: CaptureMode,
     /// Optional region (required for [`CaptureMode::Region`]).
     pub region: Option<Rect>,
+    /// Optional target window (required for [`CaptureMode::Window`]).
+    pub window_id: Option<crate::window::WindowId>,
     /// Optional delay in milliseconds before capture.
     pub delay_ms: u32,
 }
@@ -75,6 +78,7 @@ impl CaptureRequest {
         Self {
             mode: CaptureMode::Fullscreen,
             region: None,
+            window_id: None,
             delay_ms: 0,
         }
     }
@@ -84,6 +88,17 @@ impl CaptureRequest {
         Self {
             mode: CaptureMode::Region,
             region: Some(rect),
+            window_id: None,
+            delay_ms: 0,
+        }
+    }
+
+    /// Convenience: capture a specific window.
+    pub fn window(id: crate::window::WindowId) -> Self {
+        Self {
+            mode: CaptureMode::Window,
+            region: None,
+            window_id: Some(id),
             delay_ms: 0,
         }
     }
@@ -144,6 +159,31 @@ fn which_exists(tool: &str) -> bool {
     better_shot_platform::which(tool).is_ok()
 }
 
+/// Dispatch a [`CaptureRequest`] to the appropriate backend.
+///
+/// `CaptureMode::Window` is routed through [`window::window_backend`];
+/// other modes go through [`select_backend`]. Returns a descriptive
+/// error if a request is missing a required field (region for
+/// `Region`, `window_id` for `Window`).
+pub async fn run_capture(req: &CaptureRequest) -> Result<Capture> {
+    match req.mode {
+        CaptureMode::Window => {
+            let id = req
+                .window_id
+                .as_ref()
+                .ok_or_else(|| AppError::other("CaptureMode::Window requires a window_id"))?;
+            window::window_backend().capture(id).await
+        }
+        CaptureMode::Region => {
+            if req.region.is_none() {
+                return Err(AppError::other("CaptureMode::Region requires a region"));
+            }
+            select_backend().capture(req).await
+        }
+        CaptureMode::Fullscreen => select_backend().capture(req).await,
+    }
+}
+
 #[cfg(target_os = "linux")]
 fn is_screenshots_rs_available() -> bool {
     // The `screenshots` crate is Linux-only and works on both X11
@@ -179,6 +219,48 @@ mod tests {
         let req = CaptureRequest::region(rect);
         assert_eq!(req.mode, CaptureMode::Region);
         assert_eq!(req.region, Some(rect));
+    }
+
+    #[test]
+    fn window_request_construction() {
+        use crate::window::WindowId;
+        let id = WindowId::new("0x12345");
+        let req = CaptureRequest::window(id.clone());
+        assert_eq!(req.mode, CaptureMode::Window);
+        assert_eq!(req.window_id.as_ref(), Some(&id));
+        assert!(req.region.is_none());
+    }
+
+    #[tokio::test]
+    async fn run_capture_rejects_window_mode_without_id() {
+        // Build a Window request manually (bypass the constructor's
+        // invariant) and confirm run_capture() refuses it.
+        let req = CaptureRequest {
+            mode: CaptureMode::Window,
+            region: None,
+            window_id: None,
+            delay_ms: 0,
+        };
+        let err = run_capture(&req).await.unwrap_err();
+        assert!(
+            err.to_string().contains("window_id"),
+            "expected error mentioning window_id, got: {err}"
+        );
+    }
+
+    #[tokio::test]
+    async fn run_capture_rejects_region_mode_without_region() {
+        let req = CaptureRequest {
+            mode: CaptureMode::Region,
+            region: None,
+            window_id: None,
+            delay_ms: 0,
+        };
+        let err = run_capture(&req).await.unwrap_err();
+        assert!(
+            err.to_string().contains("region"),
+            "expected error mentioning region, got: {err}"
+        );
     }
 
     #[test]

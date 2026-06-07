@@ -60,11 +60,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setConfig: (next) => set({ config: next, isDirty: false }),
   patch: (patch) =>
     set((state) =>
-      state.config === null
-        ? state
-        : { config: { ...state.config, ...patch }, isDirty: true },
+      state.config === null ? state : { config: { ...state.config, ...patch }, isDirty: true },
     ),
-  reset: (config) =>
-    set({ config: config ?? null, isDirty: config ? false : false }),
+  reset: (config) => set({ config: config ?? null, isDirty: config ? false : false }),
   markClean: () => set({ isDirty: false }),
 }));

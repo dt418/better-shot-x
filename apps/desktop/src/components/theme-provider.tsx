@@ -32,9 +32,7 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 }
 
 import { createContext, useContext } from 'react';

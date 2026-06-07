@@ -43,7 +43,7 @@ export function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center text-muted-foreground">
+      <div className="text-muted-foreground flex h-full items-center justify-center">
         {t('settings.loading')}
       </div>
     );
@@ -51,7 +51,7 @@ export function SettingsPage() {
 
   if (error || !config) {
     return (
-      <div className="flex h-full items-center justify-center text-destructive">
+      <div className="text-destructive flex h-full items-center justify-center">
         {String(error ?? 'unknown')}
       </div>
     );
@@ -89,7 +89,7 @@ export function SettingsPage() {
       </header>
 
       <Tabs defaultValue="general" className="flex flex-1 overflow-hidden">
-        <TabsList className="flex h-full w-56 flex-col items-stretch justify-start gap-1 border-r bg-muted/30 p-3">
+        <TabsList className="bg-muted/30 flex h-full w-56 flex-col items-stretch justify-start gap-1 border-r p-3">
           <TabsTrigger value="general" className="justify-start">
             {t('settings.general')}
           </TabsTrigger>
@@ -121,11 +121,7 @@ export function SettingsPage() {
 
         <div className="flex-1 overflow-y-auto p-6">
           <TabsContent value="general">
-            <GeneralSection
-              config={config}
-              onPatch={patch}
-              onPickDir={pickDirectory}
-            />
+            <GeneralSection config={config} onPatch={patch} onPickDir={pickDirectory} />
           </TabsContent>
           <TabsContent value="capture">
             <ComingSoon label={t('settings.capture')} />
@@ -174,7 +170,7 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
           <Label htmlFor="locale">{t('settings.language')}</Label>
           <select
             id="locale"
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="border-input bg-background rounded-md border px-3 py-2 text-sm"
             value={config.locale}
             onChange={(e) => onPatch({ locale: e.target.value })}
           >
@@ -190,7 +186,7 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
           <Label htmlFor="theme">{t('settings.theme')}</Label>
           <select
             id="theme"
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="border-input bg-background rounded-md border px-3 py-2 text-sm"
             value={config.theme}
             onChange={(e) => onPatch({ theme: e.target.value as Theme })}
           >
@@ -210,7 +206,7 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
           <Label htmlFor="format">{t('settings.defaultFormat')}</Label>
           <select
             id="format"
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="border-input bg-background rounded-md border px-3 py-2 text-sm"
             value={config.defaultFormat}
             onChange={(e) => onPatch({ defaultFormat: e.target.value as ImageFormat })}
           >
@@ -227,7 +223,7 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
           <div className="flex gap-2">
             <input
               id="save-dir"
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm"
               value={config.defaultSaveDir ?? ''}
               placeholder={t('settings.defaultSaveDirPlaceholder')}
               onChange={(e) =>
@@ -247,7 +243,7 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="tray-enabled">{t('settings.trayEnabled')}</Label>
-            <p className="text-xs text-muted-foreground">{t('settings.trayEnabledHint')}</p>
+            <p className="text-muted-foreground text-xs">{t('settings.trayEnabledHint')}</p>
           </div>
           <Switch
             id="tray-enabled"
@@ -259,7 +255,7 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="auto-start">{t('settings.autoStart')}</Label>
-            <p className="text-xs text-muted-foreground">{t('settings.autoStartHint')}</p>
+            <p className="text-muted-foreground text-xs">{t('settings.autoStartHint')}</p>
           </div>
           <Switch
             id="auto-start"
@@ -275,8 +271,8 @@ function GeneralSection({ config, onPatch, onPickDir }: GeneralProps) {
 function ComingSoon({ label }: { label: string }) {
   const { t } = useTranslation();
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-2 py-16 text-center text-muted-foreground">
-      <h2 className="text-lg font-medium text-foreground">{label}</h2>
+    <div className="text-muted-foreground mx-auto flex max-w-2xl flex-col items-center gap-2 py-16 text-center">
+      <h2 className="text-foreground text-lg font-medium">{label}</h2>
       <p className="text-sm">{t('settings.comingSoon')}</p>
     </div>
   );

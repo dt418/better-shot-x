@@ -3,7 +3,8 @@
 
 use std::path::PathBuf;
 
-use better_shot_capture::{select_backend, CaptureRequest};
+use better_shot_capture::window::WindowInfo;
+use better_shot_capture::{select_backend, window as window_engine, CaptureRequest};
 use better_shot_core::prelude::{AppPaths, ImageFormat};
 use tauri::State;
 
@@ -12,11 +13,6 @@ use crate::state::AppState;
 
 /// Take a screenshot and save it to the configured screenshots
 /// directory. Returns the absolute path of the saved file.
-///
-/// Backend selection honours `AppConfig::capture.preferred_backend`
-/// when set; otherwise the engine picks based on the active
-/// display server (grim+slurp on Wayland, screenshots-rs on X11,
-/// portal everywhere).
 #[tauri::command]
 #[specta::specta]
 pub async fn capture_save(
@@ -32,6 +28,16 @@ pub async fn capture_save(
 
     capture.save_to(&path, format).map_err(|e| e.to_string())?;
     Ok(path.to_string_lossy().into_owned())
+}
+
+/// List the visible windows the user can pick from.
+///
+/// Returns a flat array of [`WindowInfo`] (id, title, app name, geometry)
+/// ordered by title. Used to drive the window picker overlay.
+#[tauri::command]
+#[specta::specta]
+pub async fn list_windows() -> CmdResult<Vec<WindowInfo>> {
+    window_engine::list_windows().map_err(|e| e.to_string())
 }
 
 fn build_output_path(paths: &AppPaths, format: &ImageFormat) -> PathBuf {
