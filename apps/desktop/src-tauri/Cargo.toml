@@ -67,3 +67,6 @@ parking_lot = { workspace = true }
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
+
+[dev-dependencies]
+tempfile = { workspace = true }

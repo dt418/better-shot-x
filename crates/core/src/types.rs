@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 /// 2D axis-aligned rectangle in physical pixels.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
 pub struct Rect {
     /// X coordinate of the top-left corner.
     pub x: i32,
@@ -38,7 +38,7 @@ impl Rect {
 }
 
 /// 2D size in pixels.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
 pub struct Size {
     /// Width in pixels.
     pub width: u32,
@@ -54,7 +54,9 @@ impl Size {
 }
 
 /// Supported image output formats.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ImageFormat {
     /// PNG (lossless, default).
@@ -95,7 +97,7 @@ impl ImageFormat {
 }
 
 /// Generic identifier type — wraps a UUID string.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
 #[serde(transparent)]
 pub struct Id(pub String);
 

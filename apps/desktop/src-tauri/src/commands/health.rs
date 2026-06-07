@@ -5,7 +5,7 @@ use tauri::State;
 use crate::state::AppState;
 
 #[tauri::command]
-pub fn ping(state: State<'_, AppState>) -> String {
-    let _ = state;
+#[specta::specta]
+pub fn ping(_state: State<'_, AppState>) -> String {
     "pong".to_string()
 }

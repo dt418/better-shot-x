@@ -28,7 +28,7 @@ homepage = "https://better-shot.app"
 
 [workspace.dependencies]
 # Tauri
-tauri = { version = "2", features = ["tray-icon"] }
+tauri = { version = "2", features = ["tray-icon", "specta"] }
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-notification = "2"
 tauri-plugin-dialog = "2"
@@ -40,7 +40,7 @@ tauri-plugin-process = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-log = "2"
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
-specta = "=2.0.0-rc.25"
+specta = { version = "=2.0.0-rc.25", features = ["derive", "function"] }
 specta-typescript = "0.0"
 
 # Async

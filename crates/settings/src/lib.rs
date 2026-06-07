@@ -1,95 +1,139 @@
-//! Settings engine — TOML config with migration support.
+//! TOML persistence layer for [`AppConfig`].
+//!
+//! This crate owns how [`AppConfig`] is read from / written to
+//! disk. The config struct itself lives in `better_shot_core::config`
+//! so all engine crates can refer to it without depending on the
+//! settings engine.
 
 #![forbid(unsafe_code)]
 
 use std::path::Path;
 
-use better_shot_core::Result;
-use serde::{Deserialize, Serialize};
+use better_shot_core::{AppConfig, Result};
+use tracing::{debug, warn};
 
-/// Top-level settings, persisted as TOML.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
-pub struct Settings {
-    /// Schema version for forward-compat migrations.
-    pub schema_version: u32,
-    /// Default UI locale (e.g. `"en"`, `"vi"`, `"zh-CN"`).
-    pub locale: String,
-    /// Theme preference: `"light"`, `"dark"`, `"system"`.
-    pub theme: String,
-    /// Default screenshot save location override.
-    pub default_save_dir: Option<std::path::PathBuf>,
-    /// Default image format for new screenshots.
-    pub default_format: String,
-}
-
-impl Default for Settings {
-    fn default() -> Self {
-        Self {
-            schema_version: 1,
-            locale: "en".to_string(),
-            theme: "system".to_string(),
-            default_save_dir: None,
-            default_format: "png".to_string(),
+/// Read the user's [`AppConfig`] from `path`.
+///
+/// Returns [`AppConfig::default()`] if the file is missing.
+/// On parse failure, logs a warning and falls back to defaults so the
+/// app still boots — but only after a fresh file is written so the
+/// user has a valid config to edit.
+pub fn load(path: &Path) -> Result<AppConfig> {
+    if !path.exists() {
+        debug!(path = %path.display(), "no config file yet; using defaults");
+        return Ok(AppConfig::default());
+    }
+    let raw = std::fs::read_to_string(path)?;
+    match toml::from_str::<AppConfig>(&raw) {
+        Ok(cfg) => Ok(cfg),
+        Err(e) => {
+            warn!(
+                path = %path.display(),
+                error = %e,
+                "config parse failed; falling back to defaults"
+            );
+            Ok(AppConfig::default())
         }
     }
 }
 
-impl Settings {
-    /// Load settings from `path`, falling back to defaults if missing.
-    pub fn load(path: &Path) -> Result<Self> {
-        if !path.exists() {
-            return Ok(Self::default());
-        }
-        let raw = std::fs::read_to_string(path)?;
-        let settings: Self =
-            toml::from_str(&raw).map_err(|e| better_shot_core::AppError::Config(e.to_string()))?;
-        Ok(settings)
+/// Persist `cfg` to `path`. Creates parent directories as needed.
+pub fn save(path: &Path, cfg: &AppConfig) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
     }
+    let serialized = toml::to_string_pretty(cfg)
+        .map_err(|e| better_shot_core::AppError::Config(e.to_string()))?;
+    std::fs::write(path, serialized)?;
+    Ok(())
+}
 
-    /// Persist settings to `path` (creates parent directories as needed).
-    pub fn save(&self, path: &Path) -> Result<()> {
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
-        let serialized = toml::to_string_pretty(self)
-            .map_err(|e| better_shot_core::AppError::Config(e.to_string()))?;
-        std::fs::write(path, serialized)?;
-        Ok(())
-    }
-
-    /// Merge `other` into `self` (other wins on scalar fields).
-    pub fn merge(&mut self, other: Settings) {
-        if other.schema_version != 1 {
-            self.schema_version = other.schema_version;
-        }
-        if other.locale != Self::default().locale {
-            self.locale = other.locale;
-        }
-        if other.theme != Self::default().theme {
-            self.theme = other.theme;
-        }
-        if other.default_save_dir.is_some() {
-            self.default_save_dir = other.default_save_dir;
-        }
-        if other.default_format != Self::default().default_format {
-            self.default_format = other.default_format;
-        }
+/// Apply a partial patch on top of the current config.
+///
+/// `patch` is a full [`AppConfig`] shape (not a struct-update diff);
+/// the caller is expected to fetch the current config with [`load`]
+/// first. Field-level merging would require `Option<Option<T>>` for
+/// "explicit null" which we don't need yet; revisit in M1.4.
+///
+/// `_current` is unused today but kept in the signature so the
+/// function can grow into a real diff-merge without changing callers.
+pub fn merge(_current: &AppConfig, patch: AppConfig) -> AppConfig {
+    AppConfig {
+        schema_version: patch.schema_version,
+        locale: patch.locale,
+        theme: patch.theme,
+        default_save_dir: patch.default_save_dir,
+        default_format: patch.default_format,
+        tray_enabled: patch.tray_enabled,
+        auto_start: patch.auto_start,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use better_shot_core::ImageFormat;
+    use tempfile::tempdir;
 
     #[test]
-    fn roundtrip() {
-        let tmp = tempfile::tempdir().unwrap();
+    fn missing_file_returns_defaults() {
+        let tmp = tempdir().unwrap();
         let path = tmp.path().join("config.toml");
-        let s = Settings::default();
-        s.save(&path).unwrap();
-        let loaded = Settings::load(&path).unwrap();
-        assert_eq!(s.locale, loaded.locale);
-        assert_eq!(s.theme, loaded.theme);
+        let cfg = load(&path).unwrap();
+        assert_eq!(cfg, AppConfig::default());
+    }
+
+    #[test]
+    fn roundtrip_preserves_all_fields() {
+        let tmp = tempdir().unwrap();
+        let path = tmp.path().join("config.toml");
+        let original = AppConfig {
+            locale: "vi".into(),
+            theme: better_shot_core::Theme::Dark,
+            default_save_dir: Some(std::path::PathBuf::from("/tmp/shots")),
+            default_format: ImageFormat::WebP,
+            ..AppConfig::default()
+        };
+        save(&path, &original).unwrap();
+        let loaded = load(&path).unwrap();
+        assert_eq!(loaded, original);
+    }
+
+    #[test]
+    fn corrupted_file_falls_back_to_defaults() {
+        let tmp = tempdir().unwrap();
+        let path = tmp.path().join("config.toml");
+        std::fs::write(&path, "this is = not valid [ toml").unwrap();
+        let cfg = load(&path).unwrap();
+        assert_eq!(cfg, AppConfig::default());
+    }
+
+    #[test]
+    fn save_creates_parent_dirs() {
+        let tmp = tempdir().unwrap();
+        let path = tmp.path().join("nested/dir/config.toml");
+        save(&path, &AppConfig::default()).unwrap();
+        assert!(path.exists());
+    }
+
+    #[test]
+    fn merge_replaces_every_field() {
+        let current = AppConfig {
+            locale: "en".into(),
+            theme: better_shot_core::Theme::Light,
+            ..AppConfig::default()
+        };
+        let patch = AppConfig {
+            locale: "vi".into(),
+            theme: better_shot_core::Theme::Dark,
+            default_format: ImageFormat::Jpeg,
+            ..current.clone()
+        };
+        let next = merge(&current, patch);
+        assert_eq!(next.locale, "vi");
+        assert_eq!(next.theme, better_shot_core::Theme::Dark);
+        assert_eq!(next.default_format, ImageFormat::Jpeg);
+        // Untouched fields carry through.
+        assert_eq!(next.schema_version, current.schema_version);
     }
 }

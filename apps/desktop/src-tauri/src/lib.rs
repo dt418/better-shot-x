@@ -6,33 +6,47 @@
 
 use std::sync::Arc;
 
-use better_shot_core::error::Result;
-use better_shot_core::AppPaths;
+use better_shot_core::prelude::AppConfig;
+use better_shot_core::{AppPaths, Result};
 use parking_lot::Mutex;
-use tauri::Manager;
+use tauri::{Manager, Runtime};
+use tauri_specta::Builder as SpectaBuilder;
 use tracing::{info, warn};
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
-mod commands;
-mod error;
-mod state;
+pub mod commands;
+pub mod error;
+pub mod state;
+
+pub use error::CmdResult;
 
 /// Holds shared application state across all Tauri commands.
 pub struct AppState {
     pub paths: AppPaths,
-    pub settings: Arc<Mutex<better_shot_settings::Settings>>,
-    // Engines will be injected here as they are implemented.
+    pub settings: Arc<Mutex<AppConfig>>,
 }
 
 impl AppState {
     pub fn new(paths: AppPaths) -> Result<Self> {
-        let settings = better_shot_settings::Settings::load(&paths.config_file())?;
+        let settings = better_shot_settings::load(&paths.config_file())?;
         Ok(Self {
             paths,
             settings: Arc::new(Mutex::new(settings)),
         })
     }
+}
+
+/// Build the tauri-specta builder for all known commands.
+///
+/// Exposed publicly so the build script (`build.rs`) can call
+/// `.export(...)` without duplicating the command list.
+pub fn build_specta<R: Runtime>() -> SpectaBuilder<R> {
+    SpectaBuilder::<R>::new().commands(tauri_specta::collect_commands![
+        commands::health::ping,
+        commands::settings::get_settings,
+        commands::settings::update_settings,
+    ])
 }
 
 /// Initialize structured logging to file + stderr.
@@ -62,7 +76,7 @@ pub fn init_logging(paths: &AppPaths) -> Result<WorkerGuard> {
         )
         .with(fmt::layer().with_writer(std::io::stderr).compact())
         .try_init()
-        .map_err(|e| better_shot_core::error::AppError::Other(format!("log init: {e}")))?;
+        .map_err(|e| better_shot_core::AppError::other(format!("log init: {e}")))?;
 
     info!(
         version = env!("CARGO_PKG_VERSION"),
@@ -76,13 +90,30 @@ pub fn init_logging(paths: &AppPaths) -> Result<WorkerGuard> {
 /// Tauri application entry point.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let _guard = match AppPaths::resolve().and_then(|p| init_logging(&p)) {
-        Ok(g) => g,
+    let (paths, _guard) = match AppPaths::resolve().and_then(|p| {
+        p.ensure_all()?;
+        init_logging(&p).map(|g| (p, g))
+    }) {
+        Ok(pair) => pair,
         Err(e) => {
             eprintln!("FATAL: failed to initialize: {e}");
             std::process::exit(1);
         }
     };
+
+    let specta = build_specta::<tauri::Wry>();
+
+    // On debug builds, regenerate `apps/desktop/src/bindings.ts` so
+    // the React UI always sees the latest command signatures.
+    #[cfg(debug_assertions)]
+    {
+        if let Err(e) = specta.export(
+            specta_typescript::Typescript::default(),
+            "../src/bindings.ts",
+        ) {
+            warn!("specta export failed: {e}");
+        }
+    }
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -95,8 +126,7 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .setup(|app| {
-            let paths = AppPaths::resolve()?;
+        .setup(move |app| {
             let state = AppState::new(paths)?;
 
             // System tray
@@ -112,11 +142,46 @@ pub fn run() {
             app.manage(state);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            commands::health::ping,
-            commands::settings::get_settings,
-            commands::settings::update_settings,
-        ])
+        .invoke_handler(specta.invoke_handler())
         .run(tauri::generate_context!())
         .expect("error while running Better Shot desktop");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use better_shot_core::Theme;
+
+    /// `AppState::new` must succeed against a fresh temp directory
+    /// and expose the default config snapshot.
+    #[test]
+    fn app_state_loads_defaults_from_empty_dir() {
+        let tmp = tempfile::tempdir().unwrap();
+        let paths = AppPaths::at(tmp.path());
+        paths.ensure_all().unwrap();
+        let state = AppState::new(paths).unwrap();
+        let snapshot = state.settings.lock().clone();
+        assert_eq!(snapshot.locale, "en");
+        assert_eq!(snapshot.theme, Theme::System);
+    }
+
+    /// `AppState::new` must read an existing TOML file, not silently
+    /// overwrite it.
+    #[test]
+    fn app_state_reads_existing_config() {
+        let tmp = tempfile::tempdir().unwrap();
+        let paths = AppPaths::at(tmp.path());
+        paths.ensure_all().unwrap();
+        let custom = AppConfig {
+            locale: "vi".into(),
+            theme: Theme::Dark,
+            ..AppConfig::default()
+        };
+        better_shot_settings::save(&paths.config_file(), &custom).unwrap();
+
+        let state = AppState::new(paths).unwrap();
+        let snapshot = state.settings.lock().clone();
+        assert_eq!(snapshot.locale, "vi");
+        assert_eq!(snapshot.theme, Theme::Dark);
+    }
 }
