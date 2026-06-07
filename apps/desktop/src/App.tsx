@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
+import { SettingsPage } from '@/routes/settings';
 
 type Health = { status: 'ok' | 'error'; message: string };
 
@@ -17,70 +19,69 @@ async function checkHealth(): Promise<Health> {
   }
 }
 
-export default function App() {
-  const { t, i18n } = useTranslation();
+function HomePage() {
+  const { t } = useTranslation();
   const [health, setHealth] = useState<Health | null>(null);
 
   useEffect(() => {
     void checkHealth().then(setHealth);
-    const unlisten = listen('shortcut://region-capture', () => {
-      // Capture trigger — wired up in Milestone 1.
-      console.info('region capture shortcut fired');
+  }, []);
+
+  return (
+    <div className="flex h-full flex-col">
+      <header className="flex items-center justify-between border-b px-6 py-4">
+        <h1 className="text-2xl font-semibold tracking-tight">{t('app.title')}</h1>
+        <div className="flex items-center gap-2">
+          <span
+            data-testid="health"
+            className={
+              health?.status === 'ok'
+                ? 'inline-flex items-center gap-1 text-xs text-emerald-600'
+                : 'inline-flex items-center gap-1 text-xs text-amber-600'
+            }
+          >
+            <span
+              className={
+                health?.status === 'ok'
+                  ? 'size-2 rounded-full bg-emerald-500'
+                  : 'size-2 rounded-full bg-amber-500'
+              }
+            />
+            {t('app.bridge')}: {health?.message ?? t('app.connecting')}
+          </span>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/settings">{t('tray.openSettings')}</Link>
+          </Button>
+        </div>
+      </header>
+      <main className="flex flex-1 items-center justify-center px-6 text-center text-muted-foreground">
+        {t('app.placeholder')}
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  // The tray "Settings" menu item emits a global event. The router
+  // lives inside App, so we can't use `useNavigate` here directly;
+  // we just stash a custom event the HomePage/SettingsPage can hear.
+  useEffect(() => {
+    const unlisten = listen('tray-settings', () => {
+      window.history.pushState({}, '', '/settings');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     });
     return () => {
-      void unlisten.then((u) => u());
+      void unlisten.then((fn) => fn());
     };
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background p-8 text-foreground">
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-4xl font-bold tracking-tight">{t('app.title')}</h1>
-        <p className="text-muted-foreground">{t('app.tagline')}</p>
-      </div>
-
-      <div className="flex items-center gap-2 text-sm">
-        <span
-          className={
-            health?.status === 'ok'
-              ? 'size-2 rounded-full bg-emerald-500'
-              : 'size-2 rounded-full bg-amber-500'
-          }
-        />
-        <span>
-          {t('app.bridge')}: {health ? health.message : t('app.connecting')}
-        </span>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        <Button
-          variant="outline"
-          onClick={() => i18n.changeLanguage('en')}
-          aria-pressed={i18n.language === 'en'}
-        >
-          English
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => i18n.changeLanguage('vi')}
-          aria-pressed={i18n.language === 'vi'}
-        >
-          Tiếng Việt
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => i18n.changeLanguage('zh-CN')}
-          aria-pressed={i18n.language === 'zh-CN'}
-        >
-          中文
-        </Button>
-      </div>
-
-      <p className="max-w-md text-center text-xs text-muted-foreground">
-        {t('app.placeholder')}
-      </p>
-
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>
       <Toaster />
-    </main>
+    </Router>
   );
 }
