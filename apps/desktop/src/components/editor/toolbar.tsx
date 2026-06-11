@@ -418,8 +418,7 @@ function BatchDialog({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleProcess = async () => {
-    await processBatch('export', { format });
+  const handleProcess = async () => {      await processBatch({ format });
   };
 
   return (

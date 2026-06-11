@@ -1,21 +1,5 @@
 import type { StateCreator } from 'zustand';
-import type { EditorState, TransformMode } from './types';
-
-// ---------------------------------------------------------------------------
-// Free transform types
-// ---------------------------------------------------------------------------
-
-
-
-export interface FreeTransformSlice {
-  transformMode: TransformMode | null;
-  skewAmount: number;
-
-  setTransformMode: (mode: TransformMode | null) => void;
-  setSkewAmount: (amount: number) => void;
-  applySkew: (axis: 'x' | 'y', amount: number) => void;
-  resetTransform: () => void;
-}
+import type { EditorState, FreeTransformSlice } from './types';
 
 // ---------------------------------------------------------------------------
 // Slice implementation
@@ -24,22 +8,43 @@ export interface FreeTransformSlice {
 export const createFreeTransformSlice: StateCreator<EditorState, [], [], FreeTransformSlice> = (set, get) => ({
   transformMode: null,
   skewAmount: 0,
+  distortAmount: 0,
 
-  setTransformMode: (mode) => set({ transformMode: mode }),
+  setTransformMode: (mode) => set({ transformMode: mode, skewAmount: 0, distortAmount: 0 }),
 
   setSkewAmount: (amount) => {
     set({ skewAmount: amount });
-    // Apply skew in real-time to selected object
-    const { canvas } = get();
+    const { canvas, transformMode } = get();
     if (!canvas) return;
     const obj = canvas.getActiveObject();
     if (!obj) return;
 
-    const currentMode = get().transformMode;
-    if (currentMode === 'skewX') {
+    if (transformMode === 'skewX') {
       obj.set({ skewX: amount });
-    } else if (currentMode === 'skewY') {
+    } else if (transformMode === 'skewY') {
       obj.set({ skewY: amount });
+    }
+    canvas.renderAll();
+  },
+
+  setDistortAmount: (amount) => {
+    set({ distortAmount: amount });
+    const { canvas, transformMode } = get();
+    if (!canvas) return;
+    const obj = canvas.getActiveObject();
+    if (!obj) return;
+
+    if (transformMode === 'distort') {
+      const scaleX = 1 + amount * 0.01;
+      const scaleY = 1 - amount * 0.01;
+      obj.set({ scaleX, scaleY });
+    } else if (transformMode === 'perspective') {
+      obj.set({
+        skewX: amount * 0.5,
+        skewY: amount * 0.3,
+        scaleX: 1 + amount * 0.005,
+        scaleY: 1 - amount * 0.005,
+      });
     }
     canvas.renderAll();
   },
@@ -72,6 +77,6 @@ export const createFreeTransformSlice: StateCreator<EditorState, [], [], FreeTra
       angle: 0,
     });
     canvas.renderAll();
-    set({ transformMode: null, skewAmount: 0 });
+    set({ transformMode: null, skewAmount: 0, distortAmount: 0 });
   },
 });

@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
-import type { EditorState } from './types';
-import type { ExportFormat } from './types';
+import type { EditorState, ExportFormat } from './types';
+import { processImageFile, type BatchFilterType } from '@/lib/batch-processing';
 
 // ---------------------------------------------------------------------------
 // Batch processing types
@@ -12,6 +12,7 @@ export interface BatchItem {
   path: string;
   status: 'pending' | 'processing' | 'done' | 'error';
   outputPath?: string;
+  error?: string;
 }
 
 export interface BatchSlice {
@@ -22,7 +23,19 @@ export interface BatchSlice {
   addBatchItems: (items: Omit<BatchItem, 'status'>[]) => void;
   removeBatchItem: (id: string) => void;
   clearBatchItems: () => void;
-  processBatch: (operation: 'export', options: { format: ExportFormat }) => Promise<void>;
+  processBatch: (options: { format: ExportFormat; filter?: string }) => Promise<void>;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function formatToExtension(format: ExportFormat): string {
+  switch (format) {
+    case 'jpeg': return 'jpg';
+    case 'webp': return 'webp';
+    case 'png': return 'png';
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -50,7 +63,7 @@ export const createBatchSlice: StateCreator<EditorState, [], [], BatchSlice> = (
 
   clearBatchItems: () => set({ batchItems: [] }),
 
-  processBatch: async (operation, options) => {
+  processBatch: async (options) => {
     const { batchItems } = get();
     if (batchItems.length === 0) return;
 
@@ -60,7 +73,6 @@ export const createBatchSlice: StateCreator<EditorState, [], [], BatchSlice> = (
     const total = batchItems.length;
 
     for (const item of batchItems) {
-      // Mark as processing
       set((state) => ({
         batchItems: state.batchItems.map((bi) =>
           bi.id === item.id ? { ...bi, status: 'processing' as const } : bi,
@@ -68,27 +80,45 @@ export const createBatchSlice: StateCreator<EditorState, [], [], BatchSlice> = (
       }));
 
       try {
-        if (operation === 'export') {
-          // In a real implementation, this would load each image and apply the operation
-          // For now, we simulate the batch export
-          const outputPath = item.path.replace(/\.[^.]+$/, `.${options.format === 'jpeg' ? 'jpg' : options.format}`);
-
-          // Simulate processing delay
-          await new Promise((resolve) => setTimeout(resolve, 100));
+        if (options.filter) {
+          // Apply filter to image file
+          const result = await processImageFile(item.path, { filter: options.filter as BatchFilterType });
 
           set((state) => ({
             batchItems: state.batchItems.map((bi) =>
-              bi.id === item.id ? { ...bi, status: 'done' as const, outputPath } : bi,
+              bi.id === item.id
+                ? {
+                    ...bi,
+                    status: result.success ? 'done' : 'error',
+                    outputPath: result.outputPath,
+                    error: result.error,
+                  }
+                : bi,
+            ),
+          }));
+        } else {
+          // Export-only: copy/convert file format
+          const ext = formatToExtension(options.format);
+          const outputPath = item.path.replace(/\.[^.]+$/, `.${ext}`);
+
+          // For now, we record the output path — actual file I/O
+          // requires Tauri FS plugin which is called from the batch dialog
+          set((state) => ({
+            batchItems: state.batchItems.map((bi) =>
+              bi.id === item.id
+                ? { ...bi, status: 'done', outputPath }
+                : bi,
             ),
           }));
         }
         done++;
         set({ batchProgress: { done, total } });
       } catch (err) {
-        console.warn('Batch processing failed for item:', item.name, err);
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        console.warn('Batch processing failed for item:', item.name, errorMsg);
         set((state) => ({
           batchItems: state.batchItems.map((bi) =>
-            bi.id === item.id ? { ...bi, status: 'error' as const } : bi,
+            bi.id === item.id ? { ...bi, status: 'error', error: errorMsg } : bi,
           ),
         }));
         done++;

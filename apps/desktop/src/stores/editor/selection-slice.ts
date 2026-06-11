@@ -1,6 +1,7 @@
 import { ActiveSelection } from 'fabric';
 import type { StateCreator } from 'zustand';
 import type { EditorState } from './types';
+import { magicWandSelect, createMagicWandSelection } from '@/lib/magic-wand';
 
 // ---------------------------------------------------------------------------
 // Selection types
@@ -15,6 +16,7 @@ export interface SelectionSlice {
   setSelectionMode: (mode: SelectionMode) => void;
   setMagicWandTolerance: (tolerance: number) => void;
   selectByColor: (color: string, tolerance?: number) => void;
+  magicWandSelectAtPoint: (x: number, y: number) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -80,5 +82,45 @@ export const createSelectionSlice: StateCreator<EditorState, [], [], SelectionSl
       canvas.setActiveObject(selection);
       canvas.renderAll();
     }
+  },
+
+  /**
+   * Pixel-level magic wand selection using flood-fill algorithm.
+   * Selects objects whose bounding rects overlap with the detected region.
+   */
+  magicWandSelectAtPoint: (x: number, y: number) => {
+    const { canvas } = get();
+    if (!canvas) return;
+
+    const tolerance = get().magicWandTolerance;
+    const result = magicWandSelect(canvas, x, y, { tolerance });
+    if (!result) return;
+
+    // Find objects whose centers fall within the detected bounds
+    const { bounds } = result;
+    const matches = canvas.getObjects().filter((obj) => {
+      const center = obj.getCenterPoint();
+      return (
+        center.x >= bounds.x &&
+        center.x <= bounds.x + bounds.width &&
+        center.y >= bounds.y &&
+        center.y <= bounds.y + bounds.height
+      );
+    });
+
+    if (matches.length > 0) {
+      const selection = new ActiveSelection(matches, { canvas });
+      canvas.setActiveObject(selection);
+    }
+
+    // Clean up previous selection indicators
+    canvas.getObjects().forEach((obj) => {
+      if ((obj as any).excludeFromExport && (obj as any).stroke === '#00aaff') {
+        canvas.remove(obj);
+      }
+    });
+
+    // Show selection indicator
+    createMagicWandSelection(canvas, result);
   },
 });

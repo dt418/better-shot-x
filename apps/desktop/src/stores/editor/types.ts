@@ -40,12 +40,15 @@ export interface PathOperationSlice {
 }
 
 // Free transform slice
-export type TransformMode = 'skewX' | 'skewY';
+export type TransformMode = 'skewX' | 'skewY' | 'distort' | 'perspective';
 export interface FreeTransformSlice {
   transformMode: TransformMode | null;
   skewAmount: number;
+  distortAmount: number;
+
   setTransformMode: (mode: TransformMode | null) => void;
   setSkewAmount: (amount: number) => void;
+  setDistortAmount: (amount: number) => void;
   applySkew: (axis: 'x' | 'y', amount: number) => void;
   resetTransform: () => void;
 }
@@ -65,7 +68,7 @@ export interface BatchSlice {
   addBatchItems: (items: Omit<BatchItem, 'status'>[]) => void;
   removeBatchItem: (id: string) => void;
   clearBatchItems: () => void;
-  processBatch: (operation: 'export', options: { format: ExportFormat }) => Promise<void>;
+  processBatch: (options: { format: ExportFormat; filter?: string }) => Promise<void>;
 }
 export type TextAlign = 'left' | 'center' | 'right';
 export type TextFontFamily = 'Inter' | 'Arial' | 'Georgia' | 'Courier New' | 'Impact' | 'Comic Sans MS';
