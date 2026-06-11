@@ -35,7 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- N/A
+- Refactored alignment guide cleanup to use tracked `Line[]` array instead of fragile canvas object scan
+- Merged duplicate `mouse:up` listeners into shared `cleanupGuides()` function
+- Guide lines now also cleaned on `object:modified` to prevent leaks into history snapshots
 
 ### Fixed
 
