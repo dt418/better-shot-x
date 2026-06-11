@@ -1188,11 +1188,8 @@ better-shot/
 
 **Phase 4b — Advanced**:
 
-- [x] Adjustments (brightness, contrast, saturation, hue)
 - [ ] Path operations (boolean: union, intersect, subtract)
 - [ ] Free transform (skew, distort, perspective)
-- [x] Templates (save & reuse annotation layouts)
-- [x] Multi-select + bulk operations (align, group, delete)
 - [ ] Batch processing (apply to multiple files)
 
 **Exit Criteria**:
