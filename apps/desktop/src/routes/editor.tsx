@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
+import { ActiveSelection } from 'fabric';
 
 import { EditorCanvas } from '@/components/editor/canvas';
 import { EditorToolbar } from '@/components/editor/toolbar';
@@ -105,6 +106,14 @@ export function EditorPage() {
       } else if (mod && e.key === 's' && !e.shiftKey) {
         e.preventDefault();
         void saveFile().catch(() => toast.error('Save failed'));
+      } else if (mod && e.key === 'a') {
+        e.preventDefault();
+        if (canvas && useEditorStore.getState().activeTool === 'select') {
+          canvas.discardActiveObject();
+          const sel = new ActiveSelection(canvas.getObjects(), { canvas });
+          canvas.setActiveObject(sel);
+          canvas.renderAll();
+        }
       } else if (!mod && !e.shiftKey) {
         switch (e.key.toLowerCase()) {
           case 'v':

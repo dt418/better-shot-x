@@ -17,6 +17,8 @@ export type Tool =
   | 'marker';
 
 export type FilterType = 'blur' | 'sharpen' | 'grayscale' | 'sepia' | 'pixelate';
+export type EffectType = 'dropShadow' | 'glow' | 'outline' | 'removeShadow';
+export type AdjustmentType = 'brightness' | 'contrast' | 'saturation' | 'hue';
 export type ExportFormat = 'png' | 'jpeg' | 'webp';
 export type TextAlign = 'left' | 'center' | 'right';
 export type TextFontFamily = 'Inter' | 'Arial' | 'Georgia' | 'Courier New' | 'Impact' | 'Comic Sans MS';
@@ -109,12 +111,43 @@ export interface FilterSlice {
   applyFilter: (filterType: FilterType, intensity?: number) => void;
 }
 
+export interface EffectsSlice {
+  applyEffect: (effectType: EffectType, options?: Record<string, number>) => void;
+}
+
+export interface AdjustmentSlice {
+  applyAdjustment: (adjustmentType: AdjustmentType, value: number) => void;
+}
+
+export interface MultiSelectSlice {
+  alignSelected: (direction: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => void;
+  groupSelected: () => void;
+  deleteSelected: () => void;
+}
+
 export interface ResizeSlice {
   resizeCanvas: (width: number, height: number, scaleContent?: boolean) => void;
 }
 
 export interface ResetSlice {
   reset: () => void;
+}
+
+export interface AnnotationTemplate {
+  id: string;
+  name: string;
+  createdAt: string;
+  canvasJSON: string;
+  objectCount: number;
+  thumbnail?: string;
+}
+
+export interface TemplateSlice {
+  templates: AnnotationTemplate[];
+  loadTemplates: () => void;
+  saveTemplate: (name: string) => AnnotationTemplate | null;
+  deleteTemplate: (id: string) => void;
+  applyTemplate: (id: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -127,5 +160,9 @@ export type EditorState = CanvasSlice &
   ImageSlice &
   CropSlice &
   FilterSlice &
+  EffectsSlice &
+  AdjustmentSlice &
+  MultiSelectSlice &
   ResizeSlice &
-  ResetSlice;
+  ResetSlice &
+  TemplateSlice;

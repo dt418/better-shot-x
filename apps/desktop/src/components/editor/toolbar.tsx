@@ -21,6 +21,7 @@ import {
   Square,
   Sparkles,
   Stamp,
+  Trash2,
   Type,
   Underline,
   Undo2,
@@ -30,7 +31,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { useEditorStore, type Tool, type FilterType, type ExportFormat, type TextAlign, type TextFontFamily } from '@/stores/editor';
+import { useEditorStore, type Tool, type FilterType, type EffectType, type AdjustmentType, type ExportFormat, type TextAlign, type TextFontFamily } from '@/stores/editor';
 
 // ---------------------------------------------------------------------------
 // Tool definitions
@@ -72,6 +73,20 @@ const TEXT_ALIGNMENTS: { id: TextAlign; icon: LucideIcon; label: string }[] = [
   { id: 'left', icon: AlignLeft, label: 'Align left' },
   { id: 'center', icon: AlignCenter, label: 'Align center' },
   { id: 'right', icon: AlignRight, label: 'Align right' },
+];
+
+const EFFECTS: { id: EffectType; label: string }[] = [
+  { id: 'dropShadow', label: 'Drop Shadow' },
+  { id: 'glow', label: 'Glow' },
+  { id: 'outline', label: 'Outline' },
+  { id: 'removeShadow', label: 'Remove Shadow' },
+];
+
+const ADJUSTMENTS: { id: AdjustmentType; label: string; min: number; max: number; step: number }[] = [
+  { id: 'brightness', label: 'Brightness', min: -1, max: 1, step: 0.05 },
+  { id: 'contrast', label: 'Contrast', min: -1, max: 1, step: 0.05 },
+  { id: 'saturation', label: 'Saturation', min: -1, max: 1, step: 0.05 },
+  { id: 'hue', label: 'Hue', min: -1, max: 1, step: 0.05 },
 ];
 
 const EXPORT_FORMATS: { id: ExportFormat; label: string; ext: string }[] = [
@@ -159,6 +174,245 @@ function FilterPopover() {
             </button>
           ))}
           <Popover.Arrow className="fill-popover" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+function EffectsPopover() {
+  const [open, setOpen] = useState(false);
+  const applyEffect = useEditorStore((s) => s.applyEffect);
+  const canvas = useEditorStore((s) => s.canvas);
+  const hasSelection = canvas?.getActiveObject() != null;
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2"
+          title="Apply effect"
+          disabled={!hasSelection}
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs">Effects</span>
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          align="start"
+          sideOffset={4}
+          className="w-40 rounded-md border bg-popover p-1 shadow-md"
+        >
+          {EFFECTS.map((e) => (
+            <button
+              key={e.id}
+              className="hover:bg-accent w-full rounded-sm px-2 py-1.5 text-left text-sm"
+              onClick={() => {
+                applyEffect(e.id);
+                setOpen(false);
+              }}
+            >
+              {e.label}
+            </button>
+          ))}
+          <Popover.Arrow className="fill-popover" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Template manager
+// ---------------------------------------------------------------------------
+
+function SaveTemplateDialog({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState('');
+  const saveTemplate = useEditorStore((s) => s.saveTemplate);
+
+  const handleSave = () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    saveTemplate(trimmed);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-background rounded-lg border p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+        <h3 className="mb-4 text-lg font-semibold">Save as Template</h3>
+        <p className="text-muted-foreground mb-3 text-sm">
+          Save the current canvas annotations as a reusable template.
+        </p>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Template name"
+          className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave();
+            if (e.key === 'Escape') onClose();
+          }}
+        />
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
+          <Button size="sm" onClick={handleSave} disabled={!name.trim()}>Save</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TemplateManagerPopover() {
+  const [open, setOpen] = useState(false);
+  const [showSave, setShowSave] = useState(false);
+  const canvas = useEditorStore((s) => s.canvas);
+  const templates = useEditorStore((s) => s.templates);
+  const loadTemplates = useEditorStore((s) => s.loadTemplates);
+  const deleteTemplate = useEditorStore((s) => s.deleteTemplate);
+  const applyTemplate = useEditorStore((s) => s.applyTemplate);
+  const objectCount = canvas?.getObjects().length ?? 0;
+
+  // Load templates from storage on first open
+  useEffect(() => {
+    if (open) loadTemplates();
+  }, [open, loadTemplates]);
+
+  return (
+    <>
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1.5 px-2"
+            title="Templates"
+          >
+            <Sparkles className="h-4 w-4" />
+            <span className="text-xs">Templates</span>
+          </Button>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            align="start"
+            sideOffset={4}
+            className="w-64 rounded-md border bg-popover p-2 shadow-md"
+          >
+            {/* Save button */}
+            <button
+              className="hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm"
+              onClick={() => {
+                setOpen(false);
+                setShowSave(true);
+              }}
+              disabled={objectCount === 0}
+            >
+              <Save className="h-3.5 w-3.5" />
+              <span>Save as Template</span>
+              <span className="text-muted-foreground ml-auto text-xs">{objectCount} objects</span>
+            </button>
+
+            {/* Divider */}
+            {templates.length > 0 && <div className="my-1 h-px bg-border" />}
+
+            {/* Saved templates */}
+            {templates.length === 0 ? (
+              <div className="text-muted-foreground px-2 py-3 text-center text-xs">
+                No templates saved yet
+              </div>
+            ) : (
+              templates.map((t) => (
+                <div
+                  key={t.id}
+                  className="hover:bg-accent flex items-center gap-2 rounded-sm px-2 py-1.5"
+                >
+                  <button
+                    className="min-w-0 flex-1 truncate text-left text-sm"
+                    onClick={() => {
+                      applyTemplate(t.id);
+                      setOpen(false);
+                    }}
+                    title={`Load "${t.name}"`}
+                  >
+                    <span className="font-medium">{t.name}</span>
+                    <span className="text-muted-foreground ml-1.5 text-xs">{t.objectCount} objects</span>
+                  </button>
+                  <button
+                    className="text-muted-foreground hover:text-destructive shrink-0 p-0.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteTemplate(t.id);
+                    }}
+                    title={`Delete "${t.name}"`}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+              ))
+            )}
+            <Popover.Arrow className="fill-popover" />
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+
+      {showSave && <SaveTemplateDialog onClose={() => setShowSave(false)} />}
+    </>
+  );
+}
+
+function AdjustmentsPopover() {
+  const [open, setOpen] = useState(false);
+  const applyAdjustment = useEditorStore((s) => s.applyAdjustment);
+  const imageLoaded = useEditorStore((s) => s.imageLoaded);
+
+  if (!imageLoaded) return null;
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2"
+          title="Adjust image"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs">Adjust</span>
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          align="start"
+          sideOffset={4}
+          className="w-52 rounded-md border bg-popover p-3 shadow-md"
+        >
+          {ADJUSTMENTS.map((a) => (
+            <div key={a.id} className="mb-2">
+              <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                {a.label}
+              </label>
+              <input
+                type="range"
+                min={a.min}
+                max={a.max}
+                step={a.step}
+                defaultValue={0}
+                onChange={(e) => applyAdjustment(a.id, Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          ))}
+          <button
+            className="text-muted-foreground hover:text-foreground mt-1 w-full text-center text-xs"
+            onClick={() => setOpen(false)}
+          >
+            Done
+          </button>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
@@ -614,6 +868,15 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
 
         {/* Filter */}
         <FilterPopover />
+
+        {/* Effects */}
+        <EffectsPopover />
+
+        {/* Adjustments */}
+        <AdjustmentsPopover />
+
+        {/* Templates */}
+        <TemplateManagerPopover />
 
         {/* Resize */}
         <Button

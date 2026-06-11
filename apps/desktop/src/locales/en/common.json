@@ -96,6 +96,19 @@
     "resize": "Resize",
     "filter": "Filter",
     "layers": "Layers",
-    "noLayers": "No layers yet"
+    "noLayers": "No layers yet",
+    "templates": {
+      "title": "Templates",
+      "save": "Save as Template",
+      "load": "Load Template",
+      "delete": "Delete",
+      "empty": "No templates saved",
+      "savePrompt": "Template name",
+      "saveSuccess": "Template saved",
+      "loadSuccess": "Template loaded",
+      "deleteSuccess": "Template deleted",
+      "saveButton": "Save",
+      "objects": "{count} objects"
+    }
   }
 }
