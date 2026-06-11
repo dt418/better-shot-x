@@ -361,7 +361,8 @@ Priority:
 
 ### State Management
 
-- **Command pattern** for undo/redo (every action is reversible)
+- **Zustand feature slices** for modular, type-safe state
+- **Command pattern** for undo/redo (50-snapshot history)
 - **CRDT-like** structure for collaborative-friendly state (future)
 - **Immutable snapshots** for layer state
 - **Dirty region tracking** for performance
@@ -1141,41 +1142,61 @@ better-shot/
 
 **Deliverables**:
 
-- SQLite storage
-- Screenshot history (grid + list views)
-- Search (FTS5 on OCR text)
-- Metadata (size, dimensions, app that triggered)
-- Favorites + tags
-- Export / delete actions
+- [x] SQLite storage
+- [x] Screenshot history (grid view with thumbnails)
+- [x] Search (FTS5 on OCR text)
+- [x] Metadata (format, dimensions, megapixels, file size, date, path)
+- [x] Favorites + tags
+- [x] Export / delete actions
+- [x] Image info panel (detailed metadata view)
+- [x] Batch selection mode (select all/deselect all)
+- [x] Batch export (PNG/JPEG/WebP format conversion + progress)
+- [x] Batch delete
+- [x] Format badges on thumbnails
 
 ## Milestone 4 — Editor (Full Snagit-tier)
 
 **Phase 4a — Core Tools**:
 
-- Crop, Resize
-- Selection (rect, lasso, magic wand)
-- Drawing (brush, pencil, eraser)
-- Shapes (rect, ellipse, polygon, line, arrow, curve)
-- Text (rich text with outline + shadow)
-- Effects (drop shadow, glow, outline)
-- Filters (blur, sharpen, pixelate, grayscale, sepia)
-- Color tools (eyedropper, fill, stroke)
-- Numbered markers, highlighter, stamps, callouts
-- Undo/redo (unlimited history)
-- Layers (multi-layer, blend modes, opacity, group)
-- Zoom (1%–6400%), pan, rulers, grid, snapping
-- Alignment guides between objects
-- Import (PNG, JPEG, WebP, GIF, BMP, TIFF, SVG)
-- Export (PNG, JPEG, WebP, BMP, copy to clipboard)
+- [x] Crop, Resize (with aspect ratio lock + content scaling)
+- [ ] Selection (rect, lasso, magic wand)
+- [x] Drawing (brush, pencil, freehand)
+- [x] Shapes (rectangle, ellipse, line, arrow)
+- [x] Text (font family, size, bold, italic, underline, alignment)
+- [ ] Effects (drop shadow, glow, outline)
+- [x] Filters (blur, sharpen, grayscale, sepia, pixelate)
+- [x] Color tools (fill, stroke swatches)
+- [x] Highlighter, marker tools
+- [x] Undo/redo (50-snapshot history)
+- [x] Layers (visibility, opacity, reorder, delete)
+- [x] Zoom (mouse-wheel zoom, space+drag pan)
+- [ ] Alignment guides between objects
+- [x] Import (PNG, JPEG, WebP, GIF, BMP via file dialog)
+- [x] Export (PNG, JPEG, WebP via export dialog)
+
+**Phase 4a — Completed (this session)**:
+
+- Fabric.js v7 canvas component with 10 drawing tools
+- Zustand feature-sliced state management (10 slices)
+- Toolbar with tool buttons, colors, stroke width, undo/redo, zoom
+- Text formatting toolbar (bold/italic/underline/alignment/font family/size)
+- Crop tool with overlay + confirmation
+- Resize dialog with aspect ratio lock + proportional scaling
+- Filter popover (5 filters)
+- Export dialog with format selection (PNG/JPEG/WebP)
+- Layers panel with visibility, opacity, reorder, delete
+- Keyboard shortcuts (V/R/O/L/A/T/P/C/H/M, Ctrl+Z/Y/S, Delete)
+- Status bar with canvas dimensions + filename
+- Ctrl+S save, Escape cancel crop
 
 **Phase 4b — Advanced**:
 
-- Adjustments (brightness, contrast, saturation, hue, curves, levels)
-- Path operations (boolean: union, intersect, subtract)
-- Free transform (skew, distort, perspective)
-- Templates (save & reuse)
-- Multi-select + bulk operations
-- Batch processing (apply to multiple files)
+- [ ] Adjustments (brightness, contrast, saturation, hue, curves, levels)
+- [ ] Path operations (boolean: union, intersect, subtract)
+- [ ] Free transform (skew, distort, perspective)
+- [ ] Templates (save & reuse)
+- [ ] Multi-select + bulk operations
+- [ ] Batch processing (apply to multiple files)
 
 **Exit Criteria**:
 

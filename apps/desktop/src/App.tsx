@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { SettingsPage } from '@/routes/settings';
 import { CapturePage } from '@/routes/capture';
 import { HistoryPage } from '@/routes/history';
+import { EditorPage } from '@/routes/editor';
 
 type Health = { status: 'ok' | 'error'; message: string };
 
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/capture" element={<CapturePage />} />
         <Route path="/history" element={<HistoryPage />} />
+        <Route path="/editor" element={<EditorPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
       <Toaster />

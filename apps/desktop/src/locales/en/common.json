@@ -34,11 +34,68 @@
     "error": "Capture failed",
     "app": "App"
   },
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close"
+  },
   "history": {
     "title": "History",
     "searchPlaceholder": "Search OCR text…",
     "search": "Search",
     "empty": "No screenshots yet",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit",
+    "select": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selected": "{count} selected",
+    "favorite": "Favorite",
+    "unfavorite": "Unfavorite",
+    "metadata": "Image Info",
+    "meta": {
+      "fileName": "File Name",
+      "format": "Format",
+      "dimensions": "Dimensions",
+      "megapixels": "Resolution",
+      "fileSize": "File Size",
+      "created": "Created",
+      "path": "Path"
+    },
+    "batchExport": {
+      "button": "Export Selected",
+      "title": "Batch Export",
+      "description": "Export {count} screenshots to a folder.",
+      "format": "Output Format",
+      "selectFolder": "Select output folder",
+      "export": "Export",
+      "exporting": "Exporting…",
+      "progress": "{done} / {total} exported",
+      "complete": "Exported {count} of {total} screenshots",
+      "warnings": "{count} files could not be exported"
+    },
+    "batchDelete": {
+      "button": "Delete Selected",
+      "complete": "{count} screenshots deleted"
+    }
+  },
+  "editor": {
+    "title": "Editor",
+    "openFile": "Open File",
+    "save": "Save",
+    "export": "Export",
+    "ready": "Ready",
+    "openPrompt": "Open a file to start editing",
+    "undo": "Undo",
+    "redo": "Redo",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "resetZoom": "Reset Zoom",
+    "fitToScreen": "Fit to Screen",
+    "crop": "Crop",
+    "applyCrop": "Apply Crop",
+    "resize": "Resize",
+    "filter": "Filter",
+    "layers": "Layers",
+    "noLayers": "No layers yet"
   }
 }
