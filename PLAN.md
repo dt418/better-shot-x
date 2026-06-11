@@ -1158,43 +1158,33 @@ better-shot/
 
 **Phase 4a — Core Tools**:
 
-- [x] Crop, Resize (with aspect ratio lock + content scaling)
-- [ ] Selection (rect, lasso, magic wand)
-- [x] Drawing (brush, pencil, freehand)
-- [x] Shapes (rectangle, ellipse, line, arrow)
-- [x] Text (font family, size, bold, italic, underline, alignment)
-- [x] Effects (drop shadow, glow, outline)
-- [x] Filters (blur, sharpen, grayscale, sepia, pixelate)
-- [x] Color tools (fill, stroke swatches)
-- [x] Highlighter, marker tools
-- [x] Undo/redo (50-snapshot history)
-- [x] Layers (visibility, opacity, reorder, delete)
-- [x] Zoom (mouse-wheel zoom, space+drag pan)
-- [x] Alignment guides between objects (smart snap to edges + center)
-- [x] Import (PNG, JPEG, WebP, GIF, BMP via file dialog)
-- [x] Export (PNG, JPEG, WebP via export dialog)
-
-**Phase 4a — Completed (this session)**:
-
-- Fabric.js v7 canvas component with 10 drawing tools
-- Zustand feature-sliced state management (14 slices)
-- Toolbar with tool buttons, colors, stroke width, undo/redo, zoom
-- Text formatting toolbar (bold/italic/underline/alignment/font family/size)
-- Crop tool with overlay + confirmation
-- Resize dialog with aspect ratio lock + proportional scaling
-- Filter popover (5 filters)
-- Export dialog with format selection (PNG/JPEG/WebP)
-- Layers panel with visibility, opacity, reorder, delete
-- Keyboard shortcuts (V/R/O/L/A/T/P/C/H/M, Ctrl+Z/Y/S, Ctrl+A, Delete)
-- Status bar with canvas dimensions + filename
-- Ctrl+S save, Escape cancel crop
-- Effects: drop shadow, glow, outline on selected objects
-- Adjustments: brightness, contrast, saturation, hue via Fabric.js filters
-- Multi-select: align (6 directions), group, delete multiple objects
-- Templates: save/load/delete annotation layouts via localStorage
-- Smart alignment guides: snap to canvas edges/center + other objects during drag
-- Integration tests: 40+ tests covering toolbar, dialogs, popovers, layers, workflows
-- Unit tests: 117 tests across 6 test files (store slices, toolbar, templates, snapping)
+- [x] Canvas: Fabric.js v7 canvas component with zoom, pan, and viewport management
+- [x] State: Zustand feature-sliced state management (14 slices) with undo/redo
+- [x] Toolbar: Tool buttons, colors, stroke width, undo/redo, zoom controls
+- [x] Crop: Crop tool with overlay, confirmation, and aspect ratio lock
+- [x] Resize: Resize dialog with aspect ratio lock + proportional content scaling
+- [x] Drawing: Brush, pencil, freehand drawing tools
+- [x] Shapes: Rectangle, ellipse, line, arrow shapes
+- [x] Text: Rich text (font family, size, bold, italic, underline, alignment)
+- [x] Text formatting: Toolbar appears when text tool active, syncs from selected objects
+- [x] Filters: Blur, sharpen, grayscale, sepia, pixelate (5 filters)
+- [x] Effects: Drop shadow, glow, outline on selected objects
+- [x] Adjustments: Brightness, contrast, saturation, hue via Fabric.js filters
+- [x] Color tools: Fill, stroke color swatches
+- [x] Highlighter: Highlighter and marker tools
+- [x] Layers: Panel with visibility, opacity, reorder, delete
+- [x] Zoom: Mouse-wheel zoom, space+drag pan
+- [x] Keyboard shortcuts: V/R/O/L/A/T/P/C/H/M, Ctrl+Z/Y/S, Ctrl+A, Delete
+- [x] Status bar: Canvas dimensions + filename display
+- [x] Import: PNG, JPEG, WebP, GIF, BMP via file dialog
+- [x] Export: PNG, JPEG, WebP via export dialog with format selection
+- [x] Templates: Save/load/delete annotation layouts via localStorage
+- [x] Alignment guides: Smart snap to canvas edges/center + other objects during drag
+- [x] Multi-select: Shift+click, align (6 directions), group, delete
+- [ ] Selection: Rectangle, lasso, magic wand selection tools
+- [ ] Path operations: Boolean ops (union, intersect, subtract)
+- [ ] Free transform: Skew, distort, perspective transforms
+- [ ] Batch processing: Apply operations to multiple files
 
 **Phase 4b — Advanced**:
 
