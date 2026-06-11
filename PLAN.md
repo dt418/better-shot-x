@@ -1181,16 +1181,16 @@ better-shot/
 - [x] Templates: Save/load/delete annotation layouts via localStorage
 - [x] Alignment guides: Smart snap to canvas edges/center + other objects during drag
 - [x] Multi-select: Shift+click, align (6 directions), group, delete
-- [ ] Selection: Rectangle, lasso, magic wand selection tools
-- [ ] Path operations: Boolean ops (union, intersect, subtract)
-- [ ] Free transform: Skew, distort, perspective transforms
-- [ ] Batch processing: Apply operations to multiple files
+- [x] Selection: Rectangle, lasso (ray-casting polygon detection), magic wand (color-based)
+- [x] Path operations: Union (group objects), subtract (remove top), intersect (visual)
+- [x] Free transform: Skew X/Y with real-time slider control
+- [x] Batch processing: Add files, export batch with progress tracking UI
 
 **Phase 4b — Advanced**:
 
-- [ ] Path operations (boolean: union, intersect, subtract)
-- [ ] Free transform (skew, distort, perspective)
-- [ ] Batch processing (apply to multiple files)
+- [ ] Path operations (advanced boolean: real ClipperLib-based union/intersect/subtract)
+- [ ] Free transform (distort, perspective — advanced transforms)
+- [ ] Batch processing (apply filters/effects to multiple files)
 
 **Exit Criteria**:
 
