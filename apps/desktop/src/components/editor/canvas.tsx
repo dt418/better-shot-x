@@ -411,20 +411,23 @@ export function EditorCanvas() {
       useEditorStore.getState().setZoom(zoom);
     };
 
-    // -- Selection / object events -------------------------------------------
-    const onObjectModified = () => pushHistory();
-    const onPathCreated = () => pushHistory();
-
     // -- Alignment snapping --------------------------------------------------
     let activeGuideLines: ReturnType<typeof createGuideLines> = [];
+
+    const cleanupGuides = () => {
+      if (activeGuideLines.length > 0) {
+        removeGuideLines(canvas, activeGuideLines);
+        activeGuideLines = [];
+        canvas.renderAll();
+      }
+    };
 
     const onObjectMoving = (opt: { target: FabricObject }) => {
       const movingObj = opt.target;
       if (!movingObj || movingObj.selectable === false) return;
 
       // Remove previous guide lines
-      removeGuideLines(canvas);
-      activeGuideLines = [];
+      cleanupGuides();
 
       // Compute snap
       const result = computeSnap(movingObj, canvas);
@@ -440,14 +443,12 @@ export function EditorCanvas() {
       canvas.renderAll();
     };
 
-    const onObjectUp = () => {
-      // Clean up guide lines when drag ends
-      if (activeGuideLines.length > 0) {
-        removeGuideLines(canvas);
-        activeGuideLines = [];
-        canvas.renderAll();
-      }
+    // -- Selection / object events -------------------------------------------
+    const onObjectModified = () => {
+      cleanupGuides();
+      pushHistory();
     };
+    const onPathCreated = () => pushHistory();
 
     // -- Register ------------------------------------------------------------
     canvas.on('mouse:down', onMouseDown);
@@ -457,7 +458,6 @@ export function EditorCanvas() {
     canvas.on('object:modified', onObjectModified);
     canvas.on('path:created', onPathCreated);
     canvas.on('object:moving', onObjectMoving);
-    canvas.on('mouse:up', onObjectUp);
 
     // -- Cleanup on unmount --------------------------------------------------
     return () => {
@@ -471,7 +471,6 @@ export function EditorCanvas() {
       canvas.off('object:modified', onObjectModified);
       canvas.off('path:created', onPathCreated);
       canvas.off('object:moving', onObjectMoving);
-      canvas.off('mouse:up', onObjectUp);
       canvas.dispose();
       fabricRef.current = null;
     };

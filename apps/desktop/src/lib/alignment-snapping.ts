@@ -259,7 +259,6 @@ export function createGuideLines(
         evented: false,
         excludeFromExport: true,
         hasControls: false,
-        _isGuideLine: true,
       });
     } else {
       // Horizontal line spanning full canvas width
@@ -271,7 +270,6 @@ export function createGuideLines(
         evented: false,
         excludeFromExport: true,
         hasControls: false,
-        _isGuideLine: true,
       });
     }
     canvas.add(line);
@@ -284,17 +282,11 @@ export function createGuideLines(
 }
 
 /**
- * Remove all existing guide lines from the canvas.
+ * Remove specific guide lines from the canvas.
+ * Pass the tracked array from createGuideLines for safe, targeted removal.
  */
-export function removeGuideLines(canvas: FabricCanvas): void {
-  const toRemove: FabricObject[] = [];
-  canvas.forEachObject((obj: FabricObject) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((obj as any)._isGuideLine || (obj as any).excludeFromExport === true && (obj as any).stroke === GUIDE_COLOR) {
-      toRemove.push(obj);
-    }
-  });
-  for (const obj of toRemove) {
-    canvas.remove(obj);
+export function removeGuideLines(canvas: FabricCanvas, lines: Line[]): void {
+  for (const line of lines) {
+    canvas.remove(line);
   }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { computeSnap, createGuideLines, removeGuideLines } from '../alignment-snapping';
-import type { Canvas as FabricCanvas, FabricObject } from 'fabric';
+import type { Canvas as FabricCanvas, FabricObject, Line } from 'fabric';
 
 // ---------------------------------------------------------------------------
 // Mock helpers
@@ -249,29 +249,37 @@ describe('createGuideLines', () => {
 });
 
 describe('removeGuideLines', () => {
-  it('removes guide lines from canvas', () => {
-    const guideLine = { _isGuideLine: true, excludeFromExport: true, stroke: '#00bfff' };
-    const regularObj = { _isGuideLine: false, type: 'rect' };
+  it('removes specific guide lines from canvas', () => {
     const canvas = createMockCanvas();
-    canvas.forEachObject = vi.fn((fn: (obj: FabricObject) => void) => {
-      fn(guideLine as unknown as FabricObject);
-      fn(regularObj as unknown as FabricObject);
-    });
+    const mockRemove = canvas.remove as ReturnType<typeof vi.fn>;
+    const mockLine1 = { id: 'guide-1' } as unknown as Line;
+    const mockLine2 = { id: 'guide-2' } as unknown as Line;
 
-    removeGuideLines(canvas);
+    // Pass tracked array — only line1 should be removed
+    removeGuideLines(canvas, [mockLine1]);
 
-    expect(canvas.remove).toHaveBeenCalledTimes(1);
-    expect(canvas.remove).toHaveBeenCalledWith(guideLine);
+    expect(mockRemove).toHaveBeenCalledTimes(1);
+    expect(mockRemove).toHaveBeenCalledWith(mockLine1);
+    expect(mockRemove).not.toHaveBeenCalledWith(mockLine2);
   });
 
-  it('does nothing when no guide lines exist', () => {
-    const regularObj = { _isGuideLine: false, type: 'rect' };
+  it('removes multiple guide lines at once', () => {
     const canvas = createMockCanvas();
-    canvas.forEachObject = vi.fn((fn: (obj: FabricObject) => void) => {
-      fn(regularObj as unknown as FabricObject);
-    });
+    const mockRemove = canvas.remove as ReturnType<typeof vi.fn>;
+    const mockLine1 = { id: 'guide-1' } as unknown as Line;
+    const mockLine2 = { id: 'guide-2' } as unknown as Line;
 
-    removeGuideLines(canvas);
+    removeGuideLines(canvas, [mockLine1, mockLine2]);
+
+    expect(mockRemove).toHaveBeenCalledTimes(2);
+    expect(mockRemove).toHaveBeenCalledWith(mockLine1);
+    expect(mockRemove).toHaveBeenCalledWith(mockLine2);
+  });
+
+  it('does nothing when empty array is passed', () => {
+    const canvas = createMockCanvas();
+
+    removeGuideLines(canvas, []);
 
     expect(canvas.remove).not.toHaveBeenCalled();
   });
