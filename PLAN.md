@@ -1163,21 +1163,21 @@ better-shot/
 - [x] Drawing (brush, pencil, freehand)
 - [x] Shapes (rectangle, ellipse, line, arrow)
 - [x] Text (font family, size, bold, italic, underline, alignment)
-- [ ] Effects (drop shadow, glow, outline)
+- [x] Effects (drop shadow, glow, outline)
 - [x] Filters (blur, sharpen, grayscale, sepia, pixelate)
 - [x] Color tools (fill, stroke swatches)
 - [x] Highlighter, marker tools
 - [x] Undo/redo (50-snapshot history)
 - [x] Layers (visibility, opacity, reorder, delete)
 - [x] Zoom (mouse-wheel zoom, space+drag pan)
-- [ ] Alignment guides between objects
+- [x] Alignment guides between objects (smart snap to edges + center)
 - [x] Import (PNG, JPEG, WebP, GIF, BMP via file dialog)
 - [x] Export (PNG, JPEG, WebP via export dialog)
 
 **Phase 4a — Completed (this session)**:
 
 - Fabric.js v7 canvas component with 10 drawing tools
-- Zustand feature-sliced state management (10 slices)
+- Zustand feature-sliced state management (14 slices)
 - Toolbar with tool buttons, colors, stroke width, undo/redo, zoom
 - Text formatting toolbar (bold/italic/underline/alignment/font family/size)
 - Crop tool with overlay + confirmation
@@ -1185,17 +1185,24 @@ better-shot/
 - Filter popover (5 filters)
 - Export dialog with format selection (PNG/JPEG/WebP)
 - Layers panel with visibility, opacity, reorder, delete
-- Keyboard shortcuts (V/R/O/L/A/T/P/C/H/M, Ctrl+Z/Y/S, Delete)
+- Keyboard shortcuts (V/R/O/L/A/T/P/C/H/M, Ctrl+Z/Y/S, Ctrl+A, Delete)
 - Status bar with canvas dimensions + filename
 - Ctrl+S save, Escape cancel crop
+- Effects: drop shadow, glow, outline on selected objects
+- Adjustments: brightness, contrast, saturation, hue via Fabric.js filters
+- Multi-select: align (6 directions), group, delete multiple objects
+- Templates: save/load/delete annotation layouts via localStorage
+- Smart alignment guides: snap to canvas edges/center + other objects during drag
+- Integration tests: 40+ tests covering toolbar, dialogs, popovers, layers, workflows
+- Unit tests: 117 tests across 6 test files (store slices, toolbar, templates, snapping)
 
 **Phase 4b — Advanced**:
 
-- [ ] Adjustments (brightness, contrast, saturation, hue, curves, levels)
+- [x] Adjustments (brightness, contrast, saturation, hue)
 - [ ] Path operations (boolean: union, intersect, subtract)
 - [ ] Free transform (skew, distort, perspective)
-- [ ] Templates (save & reuse)
-- [ ] Multi-select + bulk operations
+- [x] Templates (save & reuse annotation layouts)
+- [x] Multi-select + bulk operations (align, group, delete)
 - [ ] Batch processing (apply to multiple files)
 
 **Exit Criteria**:
