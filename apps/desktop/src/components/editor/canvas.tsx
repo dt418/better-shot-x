@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import {
+  ActiveSelection,
   Canvas,
   Ellipse,
   Line,
@@ -14,6 +15,24 @@ import {
 import { useEditorStore } from '@/stores/editor';
 import { hexToRgba } from '@/lib/utils';
 import { computeSnap, createGuideLines, removeGuideLines } from '@/lib/alignment-snapping';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Ray-casting algorithm for point-in-polygon test. */
+function isPointInPolygon(x: number, y: number, polygon: { x: number; y: number }[]): boolean {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i]?.x ?? 0;
+    const yi = polygon[i]?.y ?? 0;
+    const xj = polygon[j]?.x ?? 0;
+    const yj = polygon[j]?.y ?? 0;
+    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
 
 // ---------------------------------------------------------------------------
 // Canvas component
@@ -103,6 +122,8 @@ export function EditorCanvas() {
     let lastPanY = 0;
     let tempObject: FabricObject | null = null;
     let spaceHeld = false;
+    let lassoPoints: { x: number; y: number }[] = [];
+    let lassoPath: FabricObject | null = null;
 
     // -- Space-key pan mode --------------------------------------------------
     const onKeyDown = (e: KeyboardEvent) => {
@@ -138,7 +159,9 @@ export function EditorCanvas() {
 
       const tool = activeToolRef.current;
       const isDrawingTool = tool === 'freehand' || tool === 'highlighter' || tool === 'marker';
-      if (tool === 'select' || isDrawingTool) return;
+      const isSelectionTool = tool === 'select' || tool === 'lasso' || tool === 'magicWand';
+      if (isSelectionTool && tool !== 'lasso') return;
+      if (isDrawingTool) return;
 
       const pointer = canvas.getScenePoint(e);
       startX = pointer.x;
@@ -172,6 +195,21 @@ export function EditorCanvas() {
       }
 
       isDrawing = true;
+
+      // Lasso tool – start drawing selection path
+      if (tool === 'lasso') {
+        lassoPoints = [{ x: startX, y: startY }];
+        // Create temporary path to show lasso outline
+        lassoPath = new Path(`M ${startX} ${startY}`, {
+          stroke: '#00aaff',
+          strokeWidth: 2,
+          fill: 'rgba(0, 170, 255, 0.1)',
+          selectable: false,
+          evented: false,
+        });
+        canvas.add(lassoPath);
+        return;
+      }
 
       // Text tool – place and enter editing immediately
       if (tool === 'text') {
@@ -256,6 +294,17 @@ export function EditorCanvas() {
       const pointer = canvas.getScenePoint(e);
       const tool = activeToolRef.current;
 
+      // Lasso tool movement
+      if (tool === 'lasso' && lassoPath) {
+        lassoPoints.push({ x: pointer.x, y: pointer.y });
+        const pathData = lassoPoints.reduce((acc, p, i) => {
+          return acc + (i === 0 ? `M ${p.x} ${p.y}` : ` L ${p.x} ${p.y}`);
+        }, 'M 0 0');
+        lassoPath.set({ path: pathData });
+        canvas.renderAll();
+        return;
+      }
+
       // Crop tool movement
       if (tool === 'crop' && cropOverlayRef.current) {
         const w = pointer.x - startX;
@@ -313,6 +362,37 @@ export function EditorCanvas() {
         canvas.selection = activeToolRef.current === 'select';
         canvas.defaultCursor = 'default';
         return;
+      }
+
+      // Lasso tool mouse up — select objects within lasso path
+      if (activeToolRef.current === 'lasso' && lassoPoints.length > 2) {
+        // Find objects whose centers are inside the lasso polygon
+        const selectedObjects = canvas.getObjects().filter((obj) => {
+          const center = obj.getCenterPoint();
+          return isPointInPolygon(center.x, center.y, lassoPoints);
+        });
+
+        // Clean up lasso path
+        if (lassoPath) {
+          canvas.remove(lassoPath);
+          lassoPath = null;
+        }
+        lassoPoints = [];
+
+        // Select found objects
+        if (selectedObjects.length > 0) {
+          canvas.discardActiveObject();
+          const selection = new ActiveSelection(selectedObjects, { canvas });
+          canvas.setActiveObject(selection);
+        }
+        canvas.renderAll();
+        isDrawing = false;
+        return;
+      } else if (lassoPath) {
+        canvas.remove(lassoPath);
+        lassoPath = null;
+        lassoPoints = [];
+        isDrawing = false;
       }
 
       // Crop tool mouse up — set crop region, keep overlay visible
@@ -489,6 +569,7 @@ export function EditorCanvas() {
     if (!canvas) return;
 
     const isDrawingTool = activeTool === 'freehand' || activeTool === 'highlighter' || activeTool === 'marker';
+    const isSelectionTool = activeTool === 'select' || activeTool === 'lasso' || activeTool === 'magicWand';
     canvas.isDrawingMode = isDrawingTool;
 
     if (isDrawingTool) {
@@ -506,10 +587,10 @@ export function EditorCanvas() {
       canvas.freeDrawingBrush = brush;
     }
 
-    canvas.selection = activeTool === 'select';
+    canvas.selection = isSelectionTool;
     canvas.forEachObject((obj: FabricObject) => {
-      obj.selectable = activeTool === 'select';
-      obj.evented = activeTool === 'select';
+      obj.selectable = isSelectionTool;
+      obj.evented = isSelectionTool;
     });
 
     // Clean up crop overlay when switching away from crop tool.

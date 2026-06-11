@@ -27,6 +27,14 @@ import {
   Undo2,
   ZoomIn,
   ZoomOut,
+  Wand2,
+  Lasso,
+  Merge,
+  Scissors,
+  Layers,
+  RotateCcw,
+  FileImage,
+  CheckSquare,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -39,6 +47,8 @@ import { useEditorStore, type Tool, type FilterType, type EffectType, type Adjus
 
 const TOOLS: { id: Tool; icon: LucideIcon; label: string; shortcut: string }[] = [
   { id: 'select', icon: MousePointer2, label: 'Select', shortcut: 'V' },
+  { id: 'lasso', icon: Lasso, label: 'Lasso Select', shortcut: 'Q' },
+  { id: 'magicWand', icon: Wand2, label: 'Magic Wand', shortcut: 'W' },
   { id: 'rectangle', icon: Square, label: 'Rectangle', shortcut: 'R' },
   { id: 'ellipse', icon: Circle, label: 'Ellipse', shortcut: 'O' },
   { id: 'line', icon: Minus, label: 'Line', shortcut: 'L' },
@@ -128,6 +138,380 @@ function ColorSwatch({
         />
       </span>
     </label>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Selection tools popover (lasso, magic wand)
+// ---------------------------------------------------------------------------
+
+function SelectionToolsPopover() {
+  const [open, setOpen] = useState(false);
+  const selectionMode = useEditorStore((s) => s.selectionMode);
+  const setSelectionMode = useEditorStore((s) => s.setSelectionMode);
+  const magicWandTolerance = useEditorStore((s) => s.magicWandTolerance);
+  const setMagicWandTolerance = useEditorStore((s) => s.setMagicWandTolerance);
+
+  const isSelectionTool = useEditorStore((s) => s.activeTool === 'lasso' || s.activeTool === 'magicWand');
+
+  if (!isSelectionTool) return null;
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2"
+          title="Selection options"
+        >
+          <MousePointer2 className="h-4 w-4" />
+          <span className="text-xs">Select</span>
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          align="start"
+          sideOffset={4}
+          className="w-48 rounded-md border bg-popover p-2 shadow-md"
+        >
+          <div className="mb-2 text-xs font-medium">Selection Mode</div>
+          <div className="flex gap-1">
+            <Button
+              variant={selectionMode === 'rectangle' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectionMode('rectangle')}
+            >
+              Rectangle
+            </Button>
+            <Button
+              variant={selectionMode === 'lasso' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectionMode('lasso')}
+            >
+              Lasso
+            </Button>
+            <Button
+              variant={selectionMode === 'magicWand' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectionMode('magicWand')}
+            >
+              Magic Wand
+            </Button>
+          </div>
+
+          {selectionMode === 'magicWand' && (
+            <div className="mt-2">
+              <label className="text-muted-foreground mb-1 block text-xs">
+                Tolerance: {magicWandTolerance}
+              </label>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={magicWandTolerance}
+                onChange={(e) => setMagicWandTolerance(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          )}
+          <Popover.Arrow className="fill-popover" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Path operations popover
+// ---------------------------------------------------------------------------
+
+function PathOperationsPopover() {
+  const [open, setOpen] = useState(false);
+  const applyPathOperation = useEditorStore((s) => s.applyPathOperation);
+  const canvas = useEditorStore((s) => s.canvas);
+  const hasSelection = canvas?.getActiveObject() != null;
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2"
+          title="Path operations"
+          disabled={!hasSelection}
+        >
+          <Merge className="h-4 w-4" />
+          <span className="text-xs">Path</span>
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          align="start"
+          sideOffset={4}
+          className="w-40 rounded-md border bg-popover p-1 shadow-md"
+        >
+          <button
+            className="hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm"
+            onClick={() => {
+              applyPathOperation('union');
+              setOpen(false);
+            }}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            <span>Union</span>
+          </button>
+          <button
+            className="hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm"
+            onClick={() => {
+              applyPathOperation('intersect');
+              setOpen(false);
+            }}
+          >
+            <CheckSquare className="h-3.5 w-3.5" />
+            <span>Intersect</span>
+          </button>
+          <button
+            className="hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm"
+            onClick={() => {
+              applyPathOperation('subtract');
+              setOpen(false);
+            }}
+          >
+            <Scissors className="h-3.5 w-3.5" />
+            <span>Subtract</span>
+          </button>
+          <Popover.Arrow className="fill-popover" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Free transform popover
+// ---------------------------------------------------------------------------
+
+function FreeTransformPopover() {
+  const [open, setOpen] = useState(false);
+  const transformMode = useEditorStore((s) => s.transformMode);
+  const setTransformMode = useEditorStore((s) => s.setTransformMode);
+  const skewAmount = useEditorStore((s) => s.skewAmount);
+  const setSkewAmount = useEditorStore((s) => s.setSkewAmount);
+  const resetTransform = useEditorStore((s) => s.resetTransform);
+  const canvas = useEditorStore((s) => s.canvas);
+  const hasSelection = canvas?.getActiveObject() != null;
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2"
+          title="Transform"
+          disabled={!hasSelection}
+        >
+          <RotateCcw className="h-4 w-4" />
+          <span className="text-xs">Transform</span>
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          align="start"
+          sideOffset={4}
+          className="w-52 rounded-md border bg-popover p-3 shadow-md"
+        >
+          <div className="mb-2 text-xs font-medium">Transform Mode</div>
+          <div className="flex flex-wrap gap-1">
+            <Button
+              variant={transformMode === 'skewX' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setTransformMode('skewX')}
+            >
+              Skew X
+            </Button>
+            <Button
+              variant={transformMode === 'skewY' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setTransformMode('skewY')}
+            >
+              Skew Y
+            </Button>
+          </div>
+
+          {transformMode && (
+            <div className="mt-2">
+              <label className="text-muted-foreground mb-1 block text-xs">
+                Amount: {skewAmount.toFixed(1)}
+              </label>
+              <input
+                type="range"
+                min={-100}
+                max={100}
+                value={skewAmount}
+                onChange={(e) => setSkewAmount(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          )}
+
+          <div className="mt-2 flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={resetTransform}
+            >
+              Reset
+            </Button>
+          </div>
+          <Popover.Arrow className="fill-popover" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Batch processing dialog
+// ---------------------------------------------------------------------------
+
+function BatchDialog({ onClose }: { onClose: () => void }) {
+  const batchItems = useEditorStore((s) => s.batchItems);
+  const addBatchItems = useEditorStore((s) => s.addBatchItems);
+  const removeBatchItem = useEditorStore((s) => s.removeBatchItem);
+  const clearBatchItems = useEditorStore((s) => s.clearBatchItems);
+  const processBatch = useEditorStore((s) => s.processBatch);
+  const batchProcessing = useEditorStore((s) => s.batchProcessing);
+  const batchProgress = useEditorStore((s) => s.batchProgress);
+  const [format, setFormat] = useState<ExportFormat>('png');
+
+  const handleAddFiles = async () => {
+    // In a real implementation, this would open a file dialog
+    // For now, we'll use the Tauri open dialog
+    try {
+      const { open } = await import('@tauri-apps/plugin-dialog');
+      const files = await open({
+        multiple: true,
+        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif'] }],
+      });
+
+      if (files) {
+        const paths = Array.isArray(files) ? files : [files];
+        addBatchItems(
+          paths.map((path) => ({
+            id: crypto.randomUUID(),
+            name: path.split('/').pop() ?? path,
+            path,
+          })),
+        );
+      }
+    } catch {
+      console.error('Failed to open file dialog');
+    }
+  };
+
+  const handleProcess = async () => {
+    await processBatch('export', { format });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-background rounded-lg border p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+        <h3 className="mb-4 text-lg font-semibold">Batch Processing</h3>
+
+        <div className="mb-4">
+          <Button variant="outline" size="sm" onClick={handleAddFiles}>
+            <FileImage className="mr-2 h-4 w-4" />
+            Add Files
+          </Button>
+          {batchItems.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearBatchItems} className="ml-2">
+              Clear All
+            </Button>
+          )}
+        </div>
+
+        {/* Format selection */}
+        <div className="mb-4">
+          <label className="text-muted-foreground mb-2 block text-xs font-medium">Export Format</label>
+          <div className="flex gap-2">
+            {EXPORT_FORMATS.map((f) => (
+              <Button
+                key={f.id}
+                variant={format === f.id ? 'default' : 'outline'}
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => setFormat(f.id)}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* File list */}
+        {batchItems.length > 0 && (
+          <div className="mb-4 max-h-48 overflow-y-auto">
+            <div className="text-muted-foreground mb-2 text-xs">
+              {batchItems.length} file(s) queued
+            </div>
+            {batchItems.map((item) => (
+              <div key={item.id} className="flex items-center gap-2 py-1 text-sm">
+                <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                <span className={`text-xs ${
+                  item.status === 'done' ? 'text-green-500' :
+                  item.status === 'error' ? 'text-red-500' :
+                  item.status === 'processing' ? 'text-yellow-500' :
+                  'text-muted-foreground'
+                }`}>
+                  {item.status}
+                </span>
+                <button
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => removeBatchItem(item.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Progress */}
+        {batchProcessing && (
+          <div className="mb-4">
+            <div className="text-muted-foreground text-xs">
+              Processing {batchProgress.done} of {batchProgress.total}...
+            </div>
+            <div className="bg-muted mt-1 h-2 rounded-full">
+              <div
+                className="bg-primary h-2 rounded-full transition-all"
+                style={{ width: `${(batchProgress.done / batchProgress.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
+          <Button
+            size="sm"
+            onClick={handleProcess}
+            disabled={batchItems.length === 0 || batchProcessing}
+          >
+            {batchProcessing ? 'Processing...' : 'Process Batch'}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -725,6 +1109,7 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
 
   const [showResize, setShowResize] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [showBatch, setShowBatch] = useState(false);
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < historyLength - 1;
@@ -767,6 +1152,10 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
             <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" onClick={() => setShowExport(true)} title="Export as… (Ctrl+Shift+S)">
               <Download className="h-4 w-4" />
               <span className="text-xs">Export</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" onClick={() => setShowBatch(true)} title="Batch processing">
+              <Layers className="h-4 w-4" />
+              <span className="text-xs">Batch</span>
             </Button>
           </>
         )}
@@ -842,6 +1231,15 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
           </>
         )}
 
+        {/* Selection tools options */}
+        <SelectionToolsPopover />
+
+        {/* Path operations */}
+        <PathOperationsPopover />
+
+        {/* Free transform */}
+        <FreeTransformPopover />
+
         {/* Undo / Redo */}
         <Button
           variant="ghost"
@@ -909,6 +1307,7 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
 
       {showResize && <ResizeDialog onClose={() => setShowResize(false)} />}
       {showExport && <ExportDialog onClose={() => setShowExport(false)} />}
+      {showBatch && <BatchDialog onClose={() => setShowBatch(false)} />}
     </>
   );
 }

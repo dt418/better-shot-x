@@ -49,6 +49,14 @@ vi.mock('lucide-react', () => {
     ZoomOut: mock('ZoomOut'),
     ChevronUp: mock('ChevronUp'),
     ChevronDown: mock('ChevronDown'),
+    Lasso: mock('Lasso'),
+    Wand2: mock('Wand2'),
+    Merge: mock('Merge'),
+    Scissors: mock('Scissors'),
+    Layers: mock('Layers'),
+    RotateCcw: mock('RotateCcw'),
+    FileImage: mock('FileImage'),
+    CheckSquare: mock('CheckSquare'),
   };
 });
 

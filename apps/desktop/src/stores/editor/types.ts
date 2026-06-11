@@ -14,12 +14,59 @@ export type Tool =
   | 'freehand'
   | 'crop'
   | 'highlighter'
-  | 'marker';
+  | 'marker'
+  | 'lasso'
+  | 'magicWand';
+
+export type ExportFormat = 'png' | 'jpeg' | 'webp';
 
 export type FilterType = 'blur' | 'sharpen' | 'grayscale' | 'sepia' | 'pixelate';
 export type EffectType = 'dropShadow' | 'glow' | 'outline' | 'removeShadow';
 export type AdjustmentType = 'brightness' | 'contrast' | 'saturation' | 'hue';
-export type ExportFormat = 'png' | 'jpeg' | 'webp';
+// Selection slice
+export type SelectionMode = 'rectangle' | 'lasso' | 'magicWand';
+export interface SelectionSlice {
+  selectionMode: SelectionMode;
+  magicWandTolerance: number;
+  setSelectionMode: (mode: SelectionMode) => void;
+  setMagicWandTolerance: (tolerance: number) => void;
+  selectByColor: (color: string, tolerance?: number) => void;
+}
+
+// Path operation slice
+export type PathOperation = 'union' | 'intersect' | 'subtract';
+export interface PathOperationSlice {
+  applyPathOperation: (operation: PathOperation) => void;
+}
+
+// Free transform slice
+export type TransformMode = 'skewX' | 'skewY';
+export interface FreeTransformSlice {
+  transformMode: TransformMode | null;
+  skewAmount: number;
+  setTransformMode: (mode: TransformMode | null) => void;
+  setSkewAmount: (amount: number) => void;
+  applySkew: (axis: 'x' | 'y', amount: number) => void;
+  resetTransform: () => void;
+}
+
+// Batch slice
+export interface BatchItem {
+  id: string;
+  name: string;
+  path: string;
+  status: 'pending' | 'processing' | 'done' | 'error';
+  outputPath?: string;
+}
+export interface BatchSlice {
+  batchItems: BatchItem[];
+  batchProcessing: boolean;
+  batchProgress: { done: number; total: number };
+  addBatchItems: (items: Omit<BatchItem, 'status'>[]) => void;
+  removeBatchItem: (id: string) => void;
+  clearBatchItems: () => void;
+  processBatch: (operation: 'export', options: { format: ExportFormat }) => Promise<void>;
+}
 export type TextAlign = 'left' | 'center' | 'right';
 export type TextFontFamily = 'Inter' | 'Arial' | 'Georgia' | 'Courier New' | 'Impact' | 'Comic Sans MS';
 
@@ -165,4 +212,8 @@ export type EditorState = CanvasSlice &
   MultiSelectSlice &
   ResizeSlice &
   ResetSlice &
-  TemplateSlice;
+  TemplateSlice &
+  SelectionSlice &
+  PathOperationSlice &
+  FreeTransformSlice &
+  BatchSlice;

@@ -13,6 +13,10 @@ import { createMultiSelectSlice } from './multi-select-slice';
 import { createResizeSlice } from './resize-slice';
 import { createResetSlice } from './reset-slice';
 import { createTemplateSlice } from './template-slice';
+import { createSelectionSlice } from './selection-slice';
+import { createPathOperationSlice } from './path-operation-slice';
+import { createFreeTransformSlice } from './free-transform-slice';
+import { createBatchSlice } from './batch-slice';
 
 // Re-export types so consumers only need to import from '@/stores/editor'
 export type {
@@ -38,6 +42,14 @@ export type {
   ResizeSlice,
   ResetSlice,
   TemplateSlice,
+  SelectionSlice,
+  SelectionMode,
+  PathOperationSlice,
+  PathOperation,
+  FreeTransformSlice,
+  TransformMode,
+  BatchSlice,
+  BatchItem,
 } from './types';
 
 export const useEditorStore = create<EditorState>()((...a) => ({
@@ -53,4 +65,8 @@ export const useEditorStore = create<EditorState>()((...a) => ({
   ...createResizeSlice(...a),
   ...createResetSlice(...a),
   ...createTemplateSlice(...a),
+  ...createSelectionSlice(...a),
+  ...createPathOperationSlice(...a),
+  ...createFreeTransformSlice(...a),
+  ...createBatchSlice(...a),
 }));
