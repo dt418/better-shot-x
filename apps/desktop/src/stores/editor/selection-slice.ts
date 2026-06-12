@@ -115,7 +115,7 @@ export const createSelectionSlice: StateCreator<EditorState, [], [], SelectionSl
 
     // Clean up previous selection indicators
     canvas.getObjects().forEach((obj) => {
-      if ((obj as any).excludeFromExport && (obj as any).stroke === '#00aaff') {
+      if ((obj as { name?: string }).name === '__magicwand_indicator') {
         canvas.remove(obj);
       }
     });

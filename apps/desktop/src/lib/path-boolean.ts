@@ -12,14 +12,44 @@ type Polygon = [number, number][];
 // ---------------------------------------------------------------------------
 
 /**
- * Extract polygon coordinates from a Fabric.js object's bounding path.
- * Uses the object's bounding rect and applies any transformations.
+ * Extract polygon coordinates from a Fabric.js object.
+ * Uses actual path points when available (Path objects), falls back to bounding rect.
  */
 function objectToPolygon(obj: FabricObject): Polygon {
+  // Try to extract actual path points for Path objects
+  const pathObj = obj as unknown as {
+    path?: Array<{
+      type: string;
+      x?: number;
+      y?: number;
+    }>;
+  };
+  if (pathObj.path && Array.isArray(pathObj.path)) {
+    const points: Polygon = [];
+    for (const cmd of pathObj.path) {
+      if (cmd.type === 'M' || cmd.type === 'L') {
+        if (cmd.x !== undefined && cmd.y !== undefined) {
+          points.push([cmd.x, cmd.y]);
+        }
+      } else if (cmd.type === 'Q' && cmd.x !== undefined && cmd.y !== undefined) {
+        points.push([cmd.x, cmd.y]);
+      } else if (cmd.type === 'C' && cmd.x !== undefined && cmd.y !== undefined) {
+        points.push([cmd.x, cmd.y]);
+      }
+    }
+    if (points.length >= 3) return points;
+  }
+
+  // Try polygon objects that have a points property (Polygon, Polyline)
+  const maybePolygon = obj as unknown as { points?: Array<{ x: number; y: number }> };
+  if (maybePolygon.points && Array.isArray(maybePolygon.points) && maybePolygon.points.length >= 3) {
+    return maybePolygon.points.map((pt) => [pt.x, pt.y] as [number, number]);
+  }
+
+  // Fallback to bounding rect
   const rect = obj.getBoundingRect();
   const { left, top, width, height } = rect;
 
-  // Return rectangle polygon
   return [
     [left, top],
     [left + width, top],
@@ -66,7 +96,6 @@ export function booleanUnion(
   // Take the first result polygon
   const resultPolygon = solution[0]?.[0];
   if (!resultPolygon) {
-    // Fallback: return objA unchanged
     return objA;
   }
 
@@ -105,7 +134,6 @@ export function booleanIntersect(
       strokeWidth: options?.strokeWidth ?? objA.strokeWidth ?? 1,
     });
   } catch {
-    // No intersection
     return null;
   }
 }
@@ -133,7 +161,7 @@ export function booleanSubtract(
     const pathData = polygonToPathData(resultPolygon);
     return new Path(pathData, {
       fill: options?.fill ?? (typeof objA.fill === 'string' ? objA.fill : '#000000'),
-      stroke: options?.stroke ?? (typeof objA.stroke === 'string' ? objA.stroke : '#000000'),
+      stroke: options?.stroke ?? (typeof objB.stroke === 'string' ? objB.stroke : '#000000'),
       strokeWidth: options?.strokeWidth ?? objA.strokeWidth ?? 1,
     });
   } catch {

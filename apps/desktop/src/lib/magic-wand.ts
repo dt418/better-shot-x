@@ -150,6 +150,7 @@ export function createMagicWandSelection(
     selectable: false,
     evented: false,
     excludeFromExport: true,
+    name: '__magicwand_indicator',
   });
 
   canvas.add(selectionRect);

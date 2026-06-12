@@ -73,7 +73,6 @@ export async function processImageFile(
     // Read the image file
     const imageData = await readFile(inputPath);
     const blob = new Blob([new Uint8Array(imageData)]);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const imageUrl = URL.createObjectURL(blob);
 
     // Load into Fabric.js via Image element

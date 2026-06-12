@@ -23,7 +23,7 @@ export interface BatchSlice {
   addBatchItems: (items: Omit<BatchItem, 'status'>[]) => void;
   removeBatchItem: (id: string) => void;
   clearBatchItems: () => void;
-  processBatch: (options: { format: ExportFormat; filter?: string }) => Promise<void>;
+  processBatch: (options: { format: ExportFormat; filter?: BatchFilterType }) => Promise<void>;
 }
 
 // ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ export const createBatchSlice: StateCreator<EditorState, [], [], BatchSlice> = (
       try {
         if (options.filter) {
           // Apply filter to image file
-          const result = await processImageFile(item.path, { filter: options.filter as BatchFilterType });
+          const result = await processImageFile(item.path, { filter: options.filter });
 
           set((state) => ({
             batchItems: state.batchItems.map((bi) =>

@@ -1,4 +1,5 @@
 import type { Canvas as FabricCanvas } from 'fabric';
+import type { BatchFilterType } from '@/lib/batch-processing';
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -68,7 +69,7 @@ export interface BatchSlice {
   addBatchItems: (items: Omit<BatchItem, 'status'>[]) => void;
   removeBatchItem: (id: string) => void;
   clearBatchItems: () => void;
-  processBatch: (options: { format: ExportFormat; filter?: string }) => Promise<void>;
+  processBatch: (options: { format: ExportFormat; filter?: BatchFilterType }) => Promise<void>;
 }
 export type TextAlign = 'left' | 'center' | 'right';
 export type TextFontFamily = 'Inter' | 'Arial' | 'Georgia' | 'Courier New' | 'Impact' | 'Comic Sans MS';
