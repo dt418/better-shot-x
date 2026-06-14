@@ -3,7 +3,10 @@ import { ActiveSelection } from 'fabric';
 import type { MultiSelectSlice, EditorState } from './types';
 import type { StateCreator } from 'zustand';
 
-export const createMultiSelectSlice: StateCreator<EditorState, [], [], MultiSelectSlice> = (_set, get) => ({
+export const createMultiSelectSlice: StateCreator<EditorState, [], [], MultiSelectSlice> = (
+  _set,
+  get,
+) => ({
   alignSelected: (direction) => {
     const { canvas, pushHistory } = get();
     if (!canvas) return;
@@ -12,9 +15,10 @@ export const createMultiSelectSlice: StateCreator<EditorState, [], [], MultiSele
     if (!activeObj) return;
 
     // For single objects, align relative to canvas
-    const objs = activeObj instanceof ActiveSelection
-      ? (activeObj as ActiveSelection).getObjects()
-      : [activeObj];
+    const objs =
+      activeObj instanceof ActiveSelection
+        ? (activeObj as ActiveSelection).getObjects()
+        : [activeObj];
 
     if (objs.length < 2) {
       // Single object: align to canvas center/edges

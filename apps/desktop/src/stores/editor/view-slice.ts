@@ -32,10 +32,13 @@ export const createViewSlice: StateCreator<EditorState, [], [], ViewSlice> = (se
     const newIndex = historyIndex - 1;
     const snapshot = history[newIndex];
     if (!snapshot) return;
-    void canvas.loadFromJSON(snapshot).then(() => {
-      canvas.renderAll();
-      set({ historyIndex: newIndex });
-    }).catch(console.error);
+    void canvas
+      .loadFromJSON(snapshot)
+      .then(() => {
+        canvas.renderAll();
+        set({ historyIndex: newIndex });
+      })
+      .catch(console.error);
   },
 
   redo: () => {
@@ -45,9 +48,12 @@ export const createViewSlice: StateCreator<EditorState, [], [], ViewSlice> = (se
     const newIndex = historyIndex + 1;
     const snapshot = history[newIndex];
     if (!snapshot) return;
-    void canvas.loadFromJSON(snapshot).then(() => {
-      canvas.renderAll();
-      set({ historyIndex: newIndex });
-    }).catch(console.error);
+    void canvas
+      .loadFromJSON(snapshot)
+      .then(() => {
+        canvas.renderAll();
+        set({ historyIndex: newIndex });
+      })
+      .catch(console.error);
   },
 });

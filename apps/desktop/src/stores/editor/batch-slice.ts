@@ -32,9 +32,12 @@ export interface BatchSlice {
 
 function formatToExtension(format: ExportFormat): string {
   switch (format) {
-    case 'jpeg': return 'jpg';
-    case 'webp': return 'webp';
-    case 'png': return 'png';
+    case 'jpeg':
+      return 'jpg';
+    case 'webp':
+      return 'webp';
+    case 'png':
+      return 'png';
   }
 }
 
@@ -105,9 +108,7 @@ export const createBatchSlice: StateCreator<EditorState, [], [], BatchSlice> = (
           // requires Tauri FS plugin which is called from the batch dialog
           set((state) => ({
             batchItems: state.batchItems.map((bi) =>
-              bi.id === item.id
-                ? { ...bi, status: 'done', outputPath }
-                : bi,
+              bi.id === item.id ? { ...bi, status: 'done', outputPath } : bi,
             ),
           }));
         }

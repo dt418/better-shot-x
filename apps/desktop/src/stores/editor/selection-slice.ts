@@ -46,7 +46,10 @@ function hexToRgb(hex: string): [number, number, number] {
 // Slice implementation
 // ---------------------------------------------------------------------------
 
-export const createSelectionSlice: StateCreator<EditorState, [], [], SelectionSlice> = (set, get) => ({
+export const createSelectionSlice: StateCreator<EditorState, [], [], SelectionSlice> = (
+  set,
+  get,
+) => ({
   selectionMode: 'rectangle',
   magicWandTolerance: 30,
 

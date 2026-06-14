@@ -12,7 +12,10 @@ export interface PathOperationSlice {
 
 // ---------------------------------------------------------------------------
 
-export const createPathOperationSlice: StateCreator<EditorState, [], [], PathOperationSlice> = (_set, get) => ({
+export const createPathOperationSlice: StateCreator<EditorState, [], [], PathOperationSlice> = (
+  _set,
+  get,
+) => ({
   applyPathOperation: (operation: PathOperation) => {
     const { canvas } = get();
     if (!canvas) return;

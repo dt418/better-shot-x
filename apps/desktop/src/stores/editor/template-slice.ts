@@ -21,7 +21,10 @@ function saveToStorage(templates: AnnotationTemplate[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
 }
 
-export const createTemplateSlice: StateCreator<EditorState, [], [], TemplateSlice> = (set, get) => ({
+export const createTemplateSlice: StateCreator<EditorState, [], [], TemplateSlice> = (
+  set,
+  get,
+) => ({
   templates: [],
 
   loadTemplates: () => {
@@ -63,9 +66,12 @@ export const createTemplateSlice: StateCreator<EditorState, [], [], TemplateSlic
     const template = get().templates.find((t) => t.id === id);
     if (!template) return;
 
-    void canvas.loadFromJSON(template.canvasJSON).then(() => {
-      canvas.renderAll();
-      get().pushHistory();
-    }).catch(console.error);
+    void canvas
+      .loadFromJSON(template.canvasJSON)
+      .then(() => {
+        canvas.renderAll();
+        get().pushHistory();
+      })
+      .catch(console.error);
   },
 });

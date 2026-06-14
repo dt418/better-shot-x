@@ -4,17 +4,18 @@ import type { AdjustmentSlice, EditorState, AdjustmentType } from './types';
 import type { StateCreator } from 'zustand';
 
 /** Maps each adjustment type to its Fabric.js filter class and option key. */
-const ADJUSTMENT_FILTER_CONFIG: Record<
-  AdjustmentType,
-  { filterClass: string; optionKey: string }
-> = {
-  brightness: { filterClass: 'Brightness', optionKey: 'brightness' },
-  contrast: { filterClass: 'Contrast', optionKey: 'contrast' },
-  saturation: { filterClass: 'Saturation', optionKey: 'saturation' },
-  hue: { filterClass: 'HueRotation', optionKey: 'rotation' },
-};
+const ADJUSTMENT_FILTER_CONFIG: Record<AdjustmentType, { filterClass: string; optionKey: string }> =
+  {
+    brightness: { filterClass: 'Brightness', optionKey: 'brightness' },
+    contrast: { filterClass: 'Contrast', optionKey: 'contrast' },
+    saturation: { filterClass: 'Saturation', optionKey: 'saturation' },
+    hue: { filterClass: 'HueRotation', optionKey: 'rotation' },
+  };
 
-export const createAdjustmentSlice: StateCreator<EditorState, [], [], AdjustmentSlice> = (_set, get) => ({
+export const createAdjustmentSlice: StateCreator<EditorState, [], [], AdjustmentSlice> = (
+  _set,
+  get,
+) => ({
   applyAdjustment: (adjustmentType: AdjustmentType, value: number) => {
     const { canvas, pushHistory } = get();
     if (!canvas) return;

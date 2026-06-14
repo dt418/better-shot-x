@@ -44,8 +44,6 @@ jobs:
           workspaces: 'target -> .git/ci-target-cache'
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:

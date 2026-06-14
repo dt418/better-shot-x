@@ -72,7 +72,13 @@ export interface BatchSlice {
   processBatch: (options: { format: ExportFormat; filter?: BatchFilterType }) => Promise<void>;
 }
 export type TextAlign = 'left' | 'center' | 'right';
-export type TextFontFamily = 'Inter' | 'Arial' | 'Georgia' | 'Courier New' | 'Impact' | 'Comic Sans MS';
+export type TextFontFamily =
+  | 'Inter'
+  | 'Arial'
+  | 'Georgia'
+  | 'Courier New'
+  | 'Impact'
+  | 'Comic Sans MS';
 
 export interface CropRegion {
   x: number;

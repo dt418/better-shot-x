@@ -62,9 +62,7 @@ export function EditorPage() {
 
       const file = await open({
         multiple: false,
-        filters: [
-          { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'] },
-        ],
+        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'] }],
       });
 
       if (!file) return;
@@ -90,7 +88,8 @@ export function EditorPage() {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       // Skip when editing a Fabric.js textbox.
       const activeObj = canvas?.getActiveObject();
-      if (activeObj && 'isEditing' in activeObj && (activeObj as { isEditing: boolean }).isEditing) return;
+      if (activeObj && 'isEditing' in activeObj && (activeObj as { isEditing: boolean }).isEditing)
+        return;
 
       const mod = e.metaKey || e.ctrlKey;
 
@@ -192,7 +191,7 @@ export function EditorPage() {
         <EditorCanvas />
         <LayersPanel />
       </div>
-      <div className="flex items-center justify-between border-t px-3 py-1 text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-between border-t px-3 py-1 text-xs">
         <div className="flex items-center gap-4">
           <span>{imageLoaded ? t('editor.ready') : t('editor.openPrompt')}</span>
           {imageLoaded && canvas && (

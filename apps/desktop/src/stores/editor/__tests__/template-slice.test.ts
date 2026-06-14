@@ -7,55 +7,67 @@ const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
     getItem: vi.fn((key: string) => store[key] ?? null),
-    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: vi.fn((key: string) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
-    get length() { return Object.keys(store).length; },
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    get length() {
+      return Object.keys(store).length;
+    },
     key: vi.fn(() => null),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
 
 // Mock Fabric.js canvas
-const createMockCanvas = () => ({
-  getWidth: vi.fn(() => 800),
-  getHeight: vi.fn(() => 600),
-  getObjects: vi.fn(() => [
-    { type: 'rect', toJSON: () => ({ type: 'rect' }) },
-    { type: 'textbox', toJSON: () => ({ type: 'textbox' }) },
-  ]),
-  getActiveObject: vi.fn(() => null),
-  setActiveObject: vi.fn(),
-  discardActiveObject: vi.fn(),
-  add: vi.fn(),
-  remove: vi.fn(),
-  renderAll: vi.fn(),
-  requestRenderAll: vi.fn(),
-  toJSON: vi.fn(() => ({ objects: [{ type: 'rect' }, { type: 'textbox' }] })),
-  loadFromJSON: vi.fn().mockImplementation(() => ({
-    then: (cb: () => void) => { cb(); return { catch: () => {} }; },
-    catch: () => {},
-  })),
-  setDimensions: vi.fn(),
-  setViewportTransform: vi.fn(),
-  setZoom: vi.fn(),
-  getZoom: vi.fn(() => 1),
-  zoomToPoint: vi.fn(),
-  getScenePoint: vi.fn(() => ({ x: 0, y: 0 })),
-  backgroundImage: null,
-  isDrawingMode: false,
-  selection: true,
-  defaultCursor: 'default',
-  forEachObject: vi.fn(),
-  toBlob: vi.fn().mockResolvedValue({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) }),
-  freeDrawingBrush: null,
-  viewportTransform: [1, 0, 0, 1, 0, 0],
-  moveObjectTo: vi.fn(),
-  on: vi.fn(),
-  off: vi.fn(),
-  dispose: vi.fn(),
-  clear: vi.fn(),
-} as unknown as Canvas);
+const createMockCanvas = () =>
+  ({
+    getWidth: vi.fn(() => 800),
+    getHeight: vi.fn(() => 600),
+    getObjects: vi.fn(() => [
+      { type: 'rect', toJSON: () => ({ type: 'rect' }) },
+      { type: 'textbox', toJSON: () => ({ type: 'textbox' }) },
+    ]),
+    getActiveObject: vi.fn(() => null),
+    setActiveObject: vi.fn(),
+    discardActiveObject: vi.fn(),
+    add: vi.fn(),
+    remove: vi.fn(),
+    renderAll: vi.fn(),
+    requestRenderAll: vi.fn(),
+    toJSON: vi.fn(() => ({ objects: [{ type: 'rect' }, { type: 'textbox' }] })),
+    loadFromJSON: vi.fn().mockImplementation(() => ({
+      then: (cb: () => void) => {
+        cb();
+        return { catch: () => {} };
+      },
+      catch: () => {},
+    })),
+    setDimensions: vi.fn(),
+    setViewportTransform: vi.fn(),
+    setZoom: vi.fn(),
+    getZoom: vi.fn(() => 1),
+    zoomToPoint: vi.fn(),
+    getScenePoint: vi.fn(() => ({ x: 0, y: 0 })),
+    backgroundImage: null,
+    isDrawingMode: false,
+    selection: true,
+    defaultCursor: 'default',
+    forEachObject: vi.fn(),
+    toBlob: vi.fn().mockResolvedValue({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) }),
+    freeDrawingBrush: null,
+    viewportTransform: [1, 0, 0, 1, 0, 0],
+    moveObjectTo: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    dispose: vi.fn(),
+    clear: vi.fn(),
+  }) as unknown as Canvas;
 
 describe('TemplateSlice', () => {
   beforeEach(() => {

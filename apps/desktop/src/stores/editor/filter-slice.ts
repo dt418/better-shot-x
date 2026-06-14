@@ -34,7 +34,9 @@ export const createFilterSlice: StateCreator<EditorState, [], [], FilterSlice> =
         bg.filters.push(new filters.Sepia());
         break;
       case 'pixelate':
-        bg.filters.push(new filters.Pixelate({ blocksize: Math.max(1, Math.round(intensity * 20)) }));
+        bg.filters.push(
+          new filters.Pixelate({ blocksize: Math.max(1, Math.round(intensity * 20)) }),
+        );
         break;
     }
 

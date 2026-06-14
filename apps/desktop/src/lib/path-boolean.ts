@@ -42,7 +42,11 @@ function objectToPolygon(obj: FabricObject): Polygon {
 
   // Try polygon objects that have a points property (Polygon, Polyline)
   const maybePolygon = obj as unknown as { points?: Array<{ x: number; y: number }> };
-  if (maybePolygon.points && Array.isArray(maybePolygon.points) && maybePolygon.points.length >= 3) {
+  if (
+    maybePolygon.points &&
+    Array.isArray(maybePolygon.points) &&
+    maybePolygon.points.length >= 3
+  ) {
     return maybePolygon.points.map((pt) => [pt.x, pt.y] as [number, number]);
   }
 
@@ -181,9 +185,10 @@ export function applyBooleanOperation(
   if (!activeObj) return;
 
   // Get individual objects from active selection or single object
-  const objects = 'getObjects' in activeObj && typeof activeObj.getObjects === 'function'
-    ? (activeObj as { getObjects: () => FabricObject[] }).getObjects()
-    : [activeObj];
+  const objects =
+    'getObjects' in activeObj && typeof activeObj.getObjects === 'function'
+      ? (activeObj as { getObjects: () => FabricObject[] }).getObjects()
+      : [activeObj];
 
   if (objects.length < 2) {
     console.warn('Boolean operations require at least 2 selected objects');

@@ -28,7 +28,7 @@ function isPointInPolygon(x: number, y: number, polygon: { x: number; y: number 
     const yi = polygon[i]?.y ?? 0;
     const xj = polygon[j]?.x ?? 0;
     const yj = polygon[j]?.y ?? 0;
-    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
     if (intersect) inside = !inside;
   }
   return inside;
@@ -127,7 +127,11 @@ export function EditorCanvas() {
 
     // -- Space-key pan mode --------------------------------------------------
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && !e.repeat && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+      if (
+        e.code === 'Space' &&
+        !e.repeat &&
+        !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
+      ) {
         spaceHeld = true;
         canvas.selection = false;
         canvas.defaultCursor = 'grab';
@@ -568,8 +572,10 @@ export function EditorCanvas() {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
-    const isDrawingTool = activeTool === 'freehand' || activeTool === 'highlighter' || activeTool === 'marker';
-    const isSelectionTool = activeTool === 'select' || activeTool === 'lasso' || activeTool === 'magicWand';
+    const isDrawingTool =
+      activeTool === 'freehand' || activeTool === 'highlighter' || activeTool === 'marker';
+    const isSelectionTool =
+      activeTool === 'select' || activeTool === 'lasso' || activeTool === 'magicWand';
     canvas.isDrawingMode = isDrawingTool;
 
     if (isDrawingTool) {

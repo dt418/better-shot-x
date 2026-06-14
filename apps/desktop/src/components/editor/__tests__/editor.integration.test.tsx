@@ -479,7 +479,9 @@ describe('Effects popover', () => {
     const mockCanvas = createMockCanvas();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (mockCanvas.getActiveObject as any).mockReturnValue({ type: 'rect' });
-    useEditorStore.setState({ canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'] });
+    useEditorStore.setState({
+      canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'],
+    });
 
     render(<EditorToolbar onOpenFile={mockOnOpenFile} />);
 
@@ -525,7 +527,9 @@ describe('Layers panel', () => {
 
   it('shows empty state when canvas has no objects', () => {
     const mockCanvas = createMockCanvas();
-    useEditorStore.setState({ canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'] });
+    useEditorStore.setState({
+      canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'],
+    });
     render(<LayersPanel />);
     expect(screen.getByText('No layers yet')).toBeInTheDocument();
   });
@@ -535,7 +539,9 @@ describe('Layers panel', () => {
     const obj1 = createMockFabricObject('rect');
     const obj2 = createMockFabricObject('textbox');
     mockCanvas._objects.push(obj1, obj2);
-    useEditorStore.setState({ canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'] });
+    useEditorStore.setState({
+      canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'],
+    });
 
     render(<LayersPanel />);
     expect(screen.getByText('Layers')).toBeInTheDocument();
@@ -631,12 +637,17 @@ describe('Keyboard shortcuts via store', () => {
     // Make loadFromJSON resolve and trigger the .then() callback
     mockCanvas.loadFromJSON = vi.fn().mockImplementation(() => {
       return {
-        then: (cb: () => void) => { cb(); return { catch: () => {} }; },
+        then: (cb: () => void) => {
+          cb();
+          return { catch: () => {} };
+        },
         catch: () => {},
       };
     });
 
-    useEditorStore.setState({ canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'] });
+    useEditorStore.setState({
+      canvas: mockCanvas as unknown as ReturnType<typeof useEditorStore.getState>['canvas'],
+    });
     const { pushHistory, undo, redo } = useEditorStore.getState();
 
     // Initial state

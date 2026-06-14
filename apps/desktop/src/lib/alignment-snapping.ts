@@ -239,10 +239,7 @@ const GUIDE_DASH = [4, 4];
  * Create temporary guide lines on the canvas.
  * Returns an array of Line objects to add/remove.
  */
-export function createGuideLines(
-  canvas: FabricCanvas,
-  guides: SnapGuide[],
-): Line[] {
+export function createGuideLines(canvas: FabricCanvas, guides: SnapGuide[]): Line[] {
   const lines: Line[] = [];
   const w = canvas.getWidth();
   const h = canvas.getHeight();

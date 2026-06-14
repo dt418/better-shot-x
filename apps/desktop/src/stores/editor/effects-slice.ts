@@ -17,23 +17,29 @@ export const createEffectsSlice: StateCreator<EditorState, [], [], EffectsSlice>
         const offsetY = options?.offsetY ?? 4;
         const blur = options?.blur ?? 6;
         const color = options?.color ? `rgba(0,0,0,${options.color})` : 'rgba(0,0,0,0.5)';
-        activeObj.set('shadow', new Shadow({
-          color,
-          offsetX,
-          offsetY,
-          blur,
-        }));
+        activeObj.set(
+          'shadow',
+          new Shadow({
+            color,
+            offsetX,
+            offsetY,
+            blur,
+          }),
+        );
         break;
       }
       case 'glow': {
         const blur = options?.blur ?? 10;
         const color = options?.color ? `rgba(255,255,0,${options.color})` : 'rgba(255,255,0,0.6)';
-        activeObj.set('shadow', new Shadow({
-          color,
-          offsetX: 0,
-          offsetY: 0,
-          blur,
-        }));
+        activeObj.set(
+          'shadow',
+          new Shadow({
+            color,
+            offsetX: 0,
+            offsetY: 0,
+            blur,
+          }),
+        );
         break;
       }
       case 'outline': {

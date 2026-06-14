@@ -1,4 +1,3 @@
-
 import { Rect, type Canvas as FabricCanvas } from 'fabric';
 
 // ---------------------------------------------------------------------------
@@ -23,8 +22,12 @@ export interface FloodFillResult {
  * Calculate Euclidean distance between two RGB colors.
  */
 function colorDistance(
-  r1: number, g1: number, b1: number,
-  r2: number, g2: number, b2: number,
+  r1: number,
+  g1: number,
+  b1: number,
+  r2: number,
+  g2: number,
+  b2: number,
 ): number {
   const dr = r1 - r2;
   const dg = g1 - g2;
@@ -132,10 +135,7 @@ export function magicWandSelect(
 /**
  * Create a visual selection indicator on the canvas from magic wand result.
  */
-export function createMagicWandSelection(
-  canvas: FabricCanvas,
-  result: FloodFillResult,
-): void {
+export function createMagicWandSelection(canvas: FabricCanvas, result: FloodFillResult): void {
   const { bounds } = result;
 
   const selectionRect = new Rect({

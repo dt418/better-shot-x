@@ -3,15 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import {
-  Download,
-  FolderOpen,
-  Image,
-  Info,
-  Maximize2,
-  Tag,
-  Trash2,
-} from 'lucide-react';
+import { Download, FolderOpen, Image, Info, Maximize2, Tag, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { formatBytes } from '@/lib/utils';
@@ -48,8 +40,6 @@ async function favoriteHistory(id: string, favorited: boolean): Promise<void> {
   return invoke<void>(CMD_FAVORITE, { id, favorited });
 }
 
-
-
 function formatDate(iso: string): string {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
@@ -81,19 +71,16 @@ function getPixelDensity(width: number, height: number): string {
 // Metadata panel for a single screenshot
 // ---------------------------------------------------------------------------
 
-function MetadataPanel({
-  item,
-  onClose,
-}: {
-  item: Screenshot;
-  onClose: () => void;
-}) {
+function MetadataPanel({ item, onClose }: { item: Screenshot; onClose: () => void }) {
   const { t } = useTranslation();
   const format = getFileFormat(item.path);
   const fileName = item.path.split('/').pop() ?? item.path;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
       <div
         className="bg-background w-full max-w-[400px] rounded-lg border p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
@@ -109,13 +96,21 @@ function MetadataPanel({
           <img
             src={`file://${item.path}`}
             alt={fileName}
-            className="max-h-48 w-full object-contain bg-muted"
+            className="bg-muted max-h-48 w-full object-contain"
           />
         </div>
 
         <div className="space-y-3 text-sm">
-          <MetadataRow label={t('history.meta.fileName')} value={fileName} icon={<Image className="h-3.5 w-3.5" />} />
-          <MetadataRow label={t('history.meta.format')} value={format} icon={<Tag className="h-3.5 w-3.5" />} />
+          <MetadataRow
+            label={t('history.meta.fileName')}
+            value={fileName}
+            icon={<Image className="h-3.5 w-3.5" />}
+          />
+          <MetadataRow
+            label={t('history.meta.format')}
+            value={format}
+            icon={<Tag className="h-3.5 w-3.5" />}
+          />
           <MetadataRow
             label={t('history.meta.dimensions')}
             value={`${item.width} × ${item.height}`}
@@ -126,9 +121,21 @@ function MetadataPanel({
             value={getPixelDensity(item.width, item.height)}
             icon={<Info className="h-3.5 w-3.5" />}
           />
-          <MetadataRow label={t('history.meta.fileSize')} value={formatBytes(item.byte_size)} icon={<Info className="h-3.5 w-3.5" />} />
-          <MetadataRow label={t('history.meta.created')} value={formatDate(item.created_at)} icon={<Info className="h-3.5 w-3.5" />} />
-          <MetadataRow label={t('history.meta.path')} value={item.path} icon={<FolderOpen className="h-3.5 w-3.5" />} />
+          <MetadataRow
+            label={t('history.meta.fileSize')}
+            value={formatBytes(item.byte_size)}
+            icon={<Info className="h-3.5 w-3.5" />}
+          />
+          <MetadataRow
+            label={t('history.meta.created')}
+            value={formatDate(item.created_at)}
+            icon={<Info className="h-3.5 w-3.5" />}
+          />
+          <MetadataRow
+            label={t('history.meta.path')}
+            value={item.path}
+            icon={<FolderOpen className="h-3.5 w-3.5" />}
+          />
         </div>
 
         <div className="mt-5 flex justify-end">
@@ -200,7 +207,11 @@ function BatchExportDialog({
       for (let i = 0; i < selectedItems.length; i++) {
         const item = selectedItems[i];
         if (!item) continue;
-        const baseName = item.path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? `screenshot-${i}`;
+        const baseName =
+          item.path
+            .split('/')
+            .pop()
+            ?.replace(/\.[^.]+$/, '') ?? `screenshot-${i}`;
         const outPath = `${dir}/${baseName}.${ext}`;
 
         try {
@@ -251,7 +262,9 @@ function BatchExportDialog({
         toast.warning(t('history.batchExport.warnings', { count: failCount }));
       }
 
-      toast.success(t('history.batchExport.complete', { count: successCount, total: selectedItems.length }));
+      toast.success(
+        t('history.batchExport.complete', { count: successCount, total: selectedItems.length }),
+      );
       onClose();
     } catch (err) {
       toast.error(String(err));
@@ -261,7 +274,10 @@ function BatchExportDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
       <div
         className="bg-background w-[400px] rounded-lg border p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
@@ -422,7 +438,9 @@ export function HistoryPage() {
                 {t('history.selected', { count: selectedIds.size })}
               </span>
               <Button variant="outline" size="sm" onClick={selectAll}>
-                {selectedIds.size === items.length ? t('history.deselectAll') : t('history.selectAll')}
+                {selectedIds.size === items.length
+                  ? t('history.deselectAll')
+                  : t('history.selectAll')}
               </Button>
               <Button
                 variant="outline"
@@ -487,7 +505,7 @@ export function HistoryPage() {
                   }`}
                 >
                   {/* Image preview */}
-                  <div className="bg-muted flex h-40 items-center justify-center relative">
+                  <div className="bg-muted relative flex h-40 items-center justify-center">
                     <img
                       src={`file://${item.path}`}
                       alt={item.id['0']}
@@ -497,21 +515,27 @@ export function HistoryPage() {
                     {selectMode && (
                       <button
                         onClick={() => toggleSelect(item.id['0'])}
-                        className={`absolute top-2 left-2 flex h-5 w-5 items-center justify-center rounded border transition-colors ${
+                        className={`absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded border transition-colors ${
                           isSelected
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-border bg-background/80 hover:bg-muted'
                         }`}
                       >
                         {isSelected && (
-                          <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                          <svg
+                            className="h-3 w-3"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
                             <path d="M2 6l3 3 5-5" />
                           </svg>
                         )}
                       </button>
                     )}
                     {/* Format badge */}
-                    <span className="bg-background/80 text-muted-foreground absolute top-2 right-2 rounded px-1.5 py-0.5 text-[10px] font-medium">
+                    <span className="bg-background/80 text-muted-foreground absolute right-2 top-2 rounded px-1.5 py-0.5 text-[10px] font-medium">
                       {format}
                     </span>
                   </div>
@@ -520,20 +544,20 @@ export function HistoryPage() {
                   <div className="flex flex-col gap-1.5 p-3 text-sm">
                     {/* Dimensions + size row */}
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="text-muted-foreground flex items-center gap-1 text-xs">
                         <Maximize2 className="h-3 w-3" />
                         {item.width}×{item.height}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         {getPixelDensity(item.width, item.height)}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         {formatBytes(item.byte_size)}
                       </span>
                     </div>
 
                     {/* Date */}
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">
                       {formatDate(item.created_at)}
                     </span>
 
@@ -589,9 +613,7 @@ export function HistoryPage() {
       </main>
 
       {/* Metadata panel */}
-      {metadataItem && (
-        <MetadataPanel item={metadataItem} onClose={() => setMetadataItem(null)} />
-      )}
+      {metadataItem && <MetadataPanel item={metadataItem} onClose={() => setMetadataItem(null)} />}
 
       {/* Batch export dialog */}
       {showBatchExport && selectedItems.length > 0 && (

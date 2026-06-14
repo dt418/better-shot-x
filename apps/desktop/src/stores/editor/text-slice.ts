@@ -20,7 +20,16 @@ export const createTextSlice: StateCreator<EditorState, [], [], TextSlice> = (se
   setFontFamily: (family) => set({ fontFamily: family }),
 
   applyTextFormatting: () => {
-    const { canvas, fontBold, fontItalic, fontUnderline, textAlign, fontFamily, fontSize, pushHistory } = get();
+    const {
+      canvas,
+      fontBold,
+      fontItalic,
+      fontUnderline,
+      textAlign,
+      fontFamily,
+      fontSize,
+      pushHistory,
+    } = get();
     if (!canvas) return;
 
     const activeObj = canvas.getActiveObject();
@@ -53,7 +62,8 @@ export const createTextSlice: StateCreator<EditorState, [], [], TextSlice> = (se
       fontItalic: textbox.fontStyle === 'italic',
       fontUnderline: textbox.underline === true,
       textAlign: (textbox.textAlign as TextAlign) ?? 'left',
-      fontFamily: (FONT_FAMILY_MAP.get(textbox.fontFamily?.split(',')[0]?.trim() ?? '') ?? 'Inter') as TextFontFamily,
+      fontFamily: (FONT_FAMILY_MAP.get(textbox.fontFamily?.split(',')[0]?.trim() ?? '') ??
+        'Inter') as TextFontFamily,
       fontSize: textbox.fontSize ?? 24,
     });
   },

@@ -39,7 +39,16 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { useEditorStore, type Tool, type FilterType, type EffectType, type AdjustmentType, type ExportFormat, type TextAlign, type TextFontFamily } from '@/stores/editor';
+import {
+  useEditorStore,
+  type Tool,
+  type FilterType,
+  type EffectType,
+  type AdjustmentType,
+  type ExportFormat,
+  type TextAlign,
+  type TextFontFamily,
+} from '@/stores/editor';
 
 // ---------------------------------------------------------------------------
 // Tool definitions
@@ -92,12 +101,13 @@ const EFFECTS: { id: EffectType; label: string }[] = [
   { id: 'removeShadow', label: 'Remove Shadow' },
 ];
 
-const ADJUSTMENTS: { id: AdjustmentType; label: string; min: number; max: number; step: number }[] = [
-  { id: 'brightness', label: 'Brightness', min: -1, max: 1, step: 0.05 },
-  { id: 'contrast', label: 'Contrast', min: -1, max: 1, step: 0.05 },
-  { id: 'saturation', label: 'Saturation', min: -1, max: 1, step: 0.05 },
-  { id: 'hue', label: 'Hue', min: -1, max: 1, step: 0.05 },
-];
+const ADJUSTMENTS: { id: AdjustmentType; label: string; min: number; max: number; step: number }[] =
+  [
+    { id: 'brightness', label: 'Brightness', min: -1, max: 1, step: 0.05 },
+    { id: 'contrast', label: 'Contrast', min: -1, max: 1, step: 0.05 },
+    { id: 'saturation', label: 'Saturation', min: -1, max: 1, step: 0.05 },
+    { id: 'hue', label: 'Hue', min: -1, max: 1, step: 0.05 },
+  ];
 
 const EXPORT_FORMATS: { id: ExportFormat; label: string; ext: string }[] = [
   { id: 'png', label: 'PNG (lossless)', ext: 'png' },
@@ -110,7 +120,7 @@ const EXPORT_FORMATS: { id: ExportFormat; label: string; ext: string }[] = [
 // ---------------------------------------------------------------------------
 
 function Divider() {
-  return <div className="mx-1 h-6 w-px bg-border" />;
+  return <div className="bg-border mx-1 h-6 w-px" />;
 }
 
 function ColorSwatch({
@@ -127,7 +137,7 @@ function ColorSwatch({
       <span className="text-muted-foreground select-none text-xs">{label}</span>
       <span className="relative">
         <span
-          className="block h-5 w-5 rounded border border-border"
+          className="border-border block h-5 w-5 rounded border"
           style={{ backgroundColor: value }}
         />
         <input
@@ -152,19 +162,16 @@ function SelectionToolsPopover() {
   const magicWandTolerance = useEditorStore((s) => s.magicWandTolerance);
   const setMagicWandTolerance = useEditorStore((s) => s.setMagicWandTolerance);
 
-  const isSelectionTool = useEditorStore((s) => s.activeTool === 'lasso' || s.activeTool === 'magicWand');
+  const isSelectionTool = useEditorStore(
+    (s) => s.activeTool === 'lasso' || s.activeTool === 'magicWand',
+  );
 
   if (!isSelectionTool) return null;
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 px-2"
-          title="Selection options"
-        >
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" title="Selection options">
           <MousePointer2 className="h-4 w-4" />
           <span className="text-xs">Select</span>
         </Button>
@@ -173,7 +180,7 @@ function SelectionToolsPopover() {
         <Popover.Content
           align="start"
           sideOffset={4}
-          className="w-48 rounded-md border bg-popover p-2 shadow-md"
+          className="bg-popover w-48 rounded-md border p-2 shadow-md"
         >
           <div className="mb-2 text-xs font-medium">Selection Mode</div>
           <div className="flex gap-1">
@@ -253,7 +260,7 @@ function PathOperationsPopover() {
         <Popover.Content
           align="start"
           sideOffset={4}
-          className="w-40 rounded-md border bg-popover p-1 shadow-md"
+          className="bg-popover w-40 rounded-md border p-1 shadow-md"
         >
           <button
             className="hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm"
@@ -324,7 +331,7 @@ function FreeTransformPopover() {
         <Popover.Content
           align="start"
           sideOffset={4}
-          className="w-52 rounded-md border bg-popover p-3 shadow-md"
+          className="bg-popover w-52 rounded-md border p-3 shadow-md"
         >
           <div className="mb-2 text-xs font-medium">Transform Mode</div>
           <div className="flex flex-wrap gap-1">
@@ -363,12 +370,7 @@ function FreeTransformPopover() {
           )}
 
           <div className="mt-2 flex gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
-              onClick={resetTransform}
-            >
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={resetTransform}>
               Reset
             </Button>
           </div>
@@ -418,12 +420,19 @@ function BatchDialog({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleProcess = async () => {      await processBatch({ format });
+  const handleProcess = async () => {
+    await processBatch({ format });
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-background rounded-lg border p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background rounded-lg border p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="mb-4 text-lg font-semibold">Batch Processing</h3>
 
         <div className="mb-4">
@@ -440,7 +449,9 @@ function BatchDialog({ onClose }: { onClose: () => void }) {
 
         {/* Format selection */}
         <div className="mb-4">
-          <label className="text-muted-foreground mb-2 block text-xs font-medium">Export Format</label>
+          <label className="text-muted-foreground mb-2 block text-xs font-medium">
+            Export Format
+          </label>
           <div className="flex gap-2">
             {EXPORT_FORMATS.map((f) => (
               <Button
@@ -465,12 +476,17 @@ function BatchDialog({ onClose }: { onClose: () => void }) {
             {batchItems.map((item) => (
               <div key={item.id} className="flex items-center gap-2 py-1 text-sm">
                 <span className="min-w-0 flex-1 truncate">{item.name}</span>
-                <span className={`text-xs ${
-                  item.status === 'done' ? 'text-green-500' :
-                  item.status === 'error' ? 'text-red-500' :
-                  item.status === 'processing' ? 'text-yellow-500' :
-                  'text-muted-foreground'
-                }`}>
+                <span
+                  className={`text-xs ${
+                    item.status === 'done'
+                      ? 'text-green-500'
+                      : item.status === 'error'
+                        ? 'text-red-500'
+                        : item.status === 'processing'
+                          ? 'text-yellow-500'
+                          : 'text-muted-foreground'
+                  }`}
+                >
                   {item.status}
                 </span>
                 <button
@@ -500,7 +516,9 @@ function BatchDialog({ onClose }: { onClose: () => void }) {
         )}
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             size="sm"
             onClick={handleProcess}
@@ -528,12 +546,7 @@ function FilterPopover() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 px-2"
-          title="Apply filter"
-        >
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" title="Apply filter">
           <Sparkles className="h-4 w-4" />
           <span className="text-xs">Filter</span>
         </Button>
@@ -542,7 +555,7 @@ function FilterPopover() {
         <Popover.Content
           align="start"
           sideOffset={4}
-          className="w-40 rounded-md border bg-popover p-1 shadow-md"
+          className="bg-popover w-40 rounded-md border p-1 shadow-md"
         >
           {FILTERS.map((f) => (
             <button
@@ -587,7 +600,7 @@ function EffectsPopover() {
         <Popover.Content
           align="start"
           sideOffset={4}
-          className="w-40 rounded-md border bg-popover p-1 shadow-md"
+          className="bg-popover w-40 rounded-md border p-1 shadow-md"
         >
           {EFFECTS.map((e) => (
             <button
@@ -624,8 +637,14 @@ function SaveTemplateDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-background rounded-lg border p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background rounded-lg border p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="mb-4 text-lg font-semibold">Save as Template</h3>
         <p className="text-muted-foreground mb-3 text-sm">
           Save the current canvas annotations as a reusable template.
@@ -643,8 +662,12 @@ function SaveTemplateDialog({ onClose }: { onClose: () => void }) {
           }}
         />
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
-          <Button size="sm" onClick={handleSave} disabled={!name.trim()}>Save</Button>
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={handleSave} disabled={!name.trim()}>
+            Save
+          </Button>
         </div>
       </div>
     </div>
@@ -670,12 +693,7 @@ function TemplateManagerPopover() {
     <>
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1.5 px-2"
-            title="Templates"
-          >
+          <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" title="Templates">
             <Sparkles className="h-4 w-4" />
             <span className="text-xs">Templates</span>
           </Button>
@@ -684,7 +702,7 @@ function TemplateManagerPopover() {
           <Popover.Content
             align="start"
             sideOffset={4}
-            className="w-64 rounded-md border bg-popover p-2 shadow-md"
+            className="bg-popover w-64 rounded-md border p-2 shadow-md"
           >
             {/* Save button */}
             <button
@@ -701,7 +719,7 @@ function TemplateManagerPopover() {
             </button>
 
             {/* Divider */}
-            {templates.length > 0 && <div className="my-1 h-px bg-border" />}
+            {templates.length > 0 && <div className="bg-border my-1 h-px" />}
 
             {/* Saved templates */}
             {templates.length === 0 ? (
@@ -723,7 +741,9 @@ function TemplateManagerPopover() {
                     title={`Load "${t.name}"`}
                   >
                     <span className="font-medium">{t.name}</span>
-                    <span className="text-muted-foreground ml-1.5 text-xs">{t.objectCount} objects</span>
+                    <span className="text-muted-foreground ml-1.5 text-xs">
+                      {t.objectCount} objects
+                    </span>
                   </button>
                   <button
                     className="text-muted-foreground hover:text-destructive shrink-0 p-0.5"
@@ -758,12 +778,7 @@ function AdjustmentsPopover() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 px-2"
-          title="Adjust image"
-        >
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" title="Adjust image">
           <Sparkles className="h-4 w-4" />
           <span className="text-xs">Adjust</span>
         </Button>
@@ -772,7 +787,7 @@ function AdjustmentsPopover() {
         <Popover.Content
           align="start"
           sideOffset={4}
-          className="w-52 rounded-md border bg-popover p-3 shadow-md"
+          className="bg-popover w-52 rounded-md border p-3 shadow-md"
         >
           {ADJUSTMENTS.map((a) => (
             <div key={a.id} className="mb-2">
@@ -833,7 +848,10 @@ function ExportDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
       <div
         className="bg-background rounded-lg border p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
@@ -844,9 +862,7 @@ function ExportDialog({ onClose }: { onClose: () => void }) {
             <label
               key={f.id}
               className={`flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors ${
-                format === f.id
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:bg-muted'
+                format === f.id ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted'
               }`}
             >
               <input
@@ -906,8 +922,14 @@ function ResizeDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-background rounded-lg border p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background rounded-lg border p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="mb-4 text-lg font-semibold">Resize Canvas</h3>
         <div className="flex items-end gap-4">
           <label className="flex flex-col gap-1">
@@ -922,7 +944,9 @@ function ResizeDialog({ onClose }: { onClose: () => void }) {
           <button
             onClick={() => setLockRatio(!lockRatio)}
             className={`mb-0.5 rounded p-1.5 transition-colors ${
-              lockRatio ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+              lockRatio
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             title={lockRatio ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
           >
@@ -938,12 +962,14 @@ function ResizeDialog({ onClose }: { onClose: () => void }) {
             />
           </label>
         </div>
-        <p className="text-muted-foreground mt-2 text-xs">
-          Content will be scaled proportionally.
-        </p>
+        <p className="text-muted-foreground mt-2 text-xs">Content will be scaled proportionally.</p>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
-          <Button size="sm" onClick={handleResize}>Resize</Button>
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={handleResize}>
+            Resize
+          </Button>
         </div>
       </div>
     </div>
@@ -1137,22 +1163,46 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
     <>
       <div className="flex flex-wrap items-center gap-1 border-b px-3 py-1.5">
         {/* File */}
-        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" onClick={onOpenFile} title="Open file (Ctrl+O)">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2"
+          onClick={onOpenFile}
+          title="Open file (Ctrl+O)"
+        >
           <FolderOpen className="h-4 w-4" />
           <span className="text-xs">Open</span>
         </Button>
 
         {imageLoaded && (
           <>
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" onClick={() => void saveFile()} title="Save (Ctrl+S)">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5 px-2"
+              onClick={() => void saveFile()}
+              title="Save (Ctrl+S)"
+            >
               <Save className="h-4 w-4" />
               <span className="text-xs">Save</span>
             </Button>
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" onClick={() => setShowExport(true)} title="Export as… (Ctrl+Shift+S)">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5 px-2"
+              onClick={() => setShowExport(true)}
+              title="Export as… (Ctrl+Shift+S)"
+            >
               <Download className="h-4 w-4" />
               <span className="text-xs">Export</span>
             </Button>
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2" onClick={() => setShowBatch(true)} title="Batch processing">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5 px-2"
+              onClick={() => setShowBatch(true)}
+              title="Batch processing"
+            >
               <Layers className="h-4 w-4" />
               <span className="text-xs">Batch</span>
             </Button>
@@ -1289,7 +1339,13 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
         <Divider />
 
         {/* Zoom */}
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => zoomBy(1 / 1.2)} title="Zoom out">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => zoomBy(1 / 1.2)}
+          title="Zoom out"
+        >
           <ZoomOut className="h-4 w-4" />
         </Button>
         <button
@@ -1299,7 +1355,13 @@ export function EditorToolbar({ onOpenFile }: EditorToolbarProps) {
         >
           {Math.round(zoom * 100)}%
         </button>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => zoomBy(1.2)} title="Zoom in">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => zoomBy(1.2)}
+          title="Zoom in"
+        >
           <ZoomIn className="h-4 w-4" />
         </Button>
       </div>

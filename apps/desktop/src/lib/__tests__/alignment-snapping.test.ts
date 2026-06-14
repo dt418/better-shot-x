@@ -24,7 +24,9 @@ const createMockCanvas = (overrides: Partial<FabricCanvas> = {}): FabricCanvas =
     getWidth: vi.fn(() => 800),
     getHeight: vi.fn(() => 600),
     getObjects: vi.fn(() => objects),
-    add: vi.fn((obj: FabricObject) => { objects.push(obj); }),
+    add: vi.fn((obj: FabricObject) => {
+      objects.push(obj);
+    }),
     remove: vi.fn((obj: FabricObject) => {
       const idx = objects.indexOf(obj);
       if (idx !== -1) objects.splice(idx, 1);
@@ -117,7 +119,7 @@ describe('computeSnap', () => {
     expect(guide.position).toBe(300);
   });
 
-  it('snaps to another object\'s left edge', () => {
+  it("snaps to another object's left edge", () => {
     const canvas = createMockCanvas();
     const existingObj = createMockObj({ left: 200, top: 0, width: 100, height: 50 });
     const movingObj = createMockObj({ left: 198, top: 100, width: 80, height: 40 });
@@ -133,7 +135,7 @@ describe('computeSnap', () => {
     expect(guide.position).toBe(200);
   });
 
-  it('snaps to another object\'s right edge', () => {
+  it("snaps to another object's right edge", () => {
     const canvas = createMockCanvas();
     const existingObj = createMockObj({ left: 100, top: 0, width: 100 }); // right = 200
     const movingObj = createMockObj({ left: 198, top: 100, width: 80 }); // moving right = 278

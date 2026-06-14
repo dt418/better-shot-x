@@ -44,7 +44,9 @@ async function applyFilterToImage(
       f.filters = [{ type: 'Sepia' }];
       break;
     case 'pixelate':
-      f.filters = [{ blocksize: Math.max(1, Math.round((intensity ?? 0.5) * 10)), type: 'Pixelate' }];
+      f.filters = [
+        { blocksize: Math.max(1, Math.round((intensity ?? 0.5) * 10)), type: 'Pixelate' },
+      ];
       break;
     case 'sharpen':
       f.filters = [{ type: 'Convolute', matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0] }];

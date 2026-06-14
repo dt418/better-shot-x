@@ -5,7 +5,10 @@ import type { EditorState, FreeTransformSlice } from './types';
 // Slice implementation
 // ---------------------------------------------------------------------------
 
-export const createFreeTransformSlice: StateCreator<EditorState, [], [], FreeTransformSlice> = (set, get) => ({
+export const createFreeTransformSlice: StateCreator<EditorState, [], [], FreeTransformSlice> = (
+  set,
+  get,
+) => ({
   transformMode: null,
   skewAmount: 0,
   distortAmount: 0,
